@@ -23,6 +23,7 @@ import {
   KeyASTNode,
   ValueASTNode,
   KeyValuesASTNode,
+  ASTNode,
 } from './ast_node';
 
 import {
@@ -176,4 +177,32 @@ export function parseWith<TResult>(
 
 export function parseAsAST(text: string): KeyValuesASTNode {
   return parseWith(text, KEY_VALUES);
+}
+
+/** Converts the given KeyValues text to a JS object. */
+export function parse(text: string): unknown {
+  const ast = parseAsAST(text);
+  return parseNode(ast);
+}
+
+/** Converts a given AST node to a JS object. */
+function parseNode(node: ASTNode): unknown {
+  if (node instanceof StringASTNodeImpl) {
+    return node.value;
+  } else if (node instanceof ObjectASTNodeImpl) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const obj: any = {};
+    node.properties.forEach((property) => {
+      const value = parseNode(property.valueNode);
+      obj[property.keyNode.value] = value;
+    });
+    return obj;
+  } else if (node instanceof PropertyASTNodeImpl) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const obj: any = {};
+    obj[node.keyNode.value] = parseNode(node.valueNode);
+    return obj;
+  } else {
+    throw new Error('Unexpected node type.');
+  }
 }
