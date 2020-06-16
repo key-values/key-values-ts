@@ -924,6 +924,11 @@ type-fest@^0.8.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
 
+typescript-parsec@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/typescript-parsec/-/typescript-parsec-0.3.1.tgz#f317c376f056eb0ce6b4051c0481d2f6b7c6b359"
+  integrity sha512-q/3gzrhKGimzTzUV+GgK4bTD+2YT0THHvIUGBkggn50dASoEmc+N58vxQR22cYfwoPvAoF6VL7/EW203yDu+dw==
+
 uri-js@^4.2.2:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.2.2.tgz#94c540e1ff772956e2299507c010aea6c8838eb0"

@@ -1,18 +1,23 @@
+export type KeyValuesASTNode = PropertyASTNode;
+
 export type ASTNode = BaseASTNode;
 
 export interface BaseASTNode {
   readonly type: 'object' | 'property' | 'string' | 'number';
-  readonly parent?: ASTNode;
+  parent?: ASTNode;
   readonly offset: number;
   readonly length: number;
   readonly children?: ASTNode[];
   readonly value?: string | number | null;
 }
 
+export type KeyASTNode = StringASTNode;
+export type ValueASTNode = LiteralASTNode | ObjectASTNode;
+
 export interface PropertyASTNode extends BaseASTNode {
   readonly type: 'property';
-  readonly keyNode: StringASTNode;
-  readonly valueNode?: ASTNode;
+  readonly keyNode: KeyASTNode;
+  readonly valueNode?: ValueASTNode;
   readonly children: ASTNode[];
 }
 
