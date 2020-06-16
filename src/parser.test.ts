@@ -40,6 +40,14 @@ describe('Parser', () => {
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value 1 and 2');
     });
+    test('should allow escaped double quote', () => {
+      const text = `"value\\"WithQuote"`;
+      const result = parseWith(text, STRING_QUOTED);
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy;
+      expect(result.value).toEqual('value"WithQuote');
+    });
   });
   describe('string', () => {
     test('should parse simple unquoted string', () => {

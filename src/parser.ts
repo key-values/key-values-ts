@@ -53,7 +53,10 @@ function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
 }
 
 function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNode {
-  const str = value.text.slice(1, value.text.length - 1);
+  // Extract string value
+  let str = value.text.slice(1, value.text.length - 1);
+  // Resolve escaped quotes
+  str = str.replace(/\\"/, '"');
   return new StringASTNodeImpl(
     undefined,
     str,
