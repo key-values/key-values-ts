@@ -11,7 +11,7 @@ export interface BaseASTNode {
 
 export interface PropertyASTNode extends BaseASTNode {
   readonly type: 'property';
-  readonly keyNode: ASTNode;
+  readonly keyNode: StringASTNode;
   readonly valueNode?: ASTNode;
   readonly children: ASTNode[];
 }
@@ -24,7 +24,7 @@ export interface ObjectASTNode extends BaseASTNode {
 
 export interface LiteralASTNode extends BaseASTNode {
   readonly type: 'string' | 'number';
-  readonly quoted: boolean;
+  readonly isQuoted: boolean;
   readonly value: string | number;
 }
 
