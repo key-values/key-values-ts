@@ -49,6 +49,7 @@ describe('Parser', () => {
       expect(result.value).toEqual('value"WithQuote');
     });
   });
+  // String
   describe('string', () => {
     test('should parse simple unquoted string', () => {
       const text = `value`;
@@ -127,6 +128,29 @@ describe('Parser', () => {
         "key1" "value1"
         "key2" "value2"
         "key3" "value3"
+      }`;
+      const result = parseWith(text, OBJECT);
+
+      expect(result.type).toEqual('object');
+      expect(result.properties.length).toBe(3);
+
+      const property1 = result.properties[0];
+      expect(property1.keyNode.value).toEqual('key1');
+      expect(property1.valueNode?.value).toEqual('value1');
+      const property2 = result.properties[1];
+      expect(property2.keyNode.value).toEqual('key2');
+      expect(property2.valueNode?.value).toEqual('value2');
+      const property3 = result.properties[2];
+      expect(property3.keyNode.value).toEqual('key3');
+      expect(property3.valueNode?.value).toEqual('value3');
+    });
+    test('should allow comments', () => {
+      const text = `{// Comment 1
+        "key1" "value1"//Comment 2
+        // Comment 3
+        "key2" "value2"
+        "key3" "value3"
+        // Comment 4
       }`;
       const result = parseWith(text, OBJECT);
 
@@ -241,6 +265,17 @@ describe('Parser', () => {
       const text = `  
          "key" "value"   
          `;
+      const result = parseAsAST(text);
+
+      expect(result.type).toEqual('property');
+      expect(result.keyNode.value).toEqual('key');
+      expect(result.valueNode.value).toEqual('value');
+    });
+    test('should allow surrounding comments', () => {
+      const text = `
+        // Comment 1
+        "key" "value"   // Comment 2
+        // Comment 3`;
       const result = parseAsAST(text);
 
       expect(result.type).toEqual('property');

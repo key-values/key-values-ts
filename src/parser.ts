@@ -13,6 +13,7 @@ import {
   Parser,
   kleft,
   kright,
+  rep_sc,
 } from 'typescript-parsec';
 
 import {
@@ -32,6 +33,9 @@ import {
 
 import { TokenKind, lexer } from './lexer';
 
+export const TRIVIA_BASE = alt(tok(TokenKind.Space), tok(TokenKind.Comment));
+export const TRIVIA = rep_sc(TRIVIA_BASE);
+export const TRIVIA_SOME = seq(TRIVIA_BASE, TRIVIA);
 export const STRING_UNQUOTED = rule<TokenKind, StringASTNode>();
 export const STRING_QUOTED = rule<TokenKind, StringASTNode>();
 export const STRING = rule<TokenKind, StringASTNode>();
@@ -143,17 +147,17 @@ OBJECT.setPattern(
     seq(
       kleft(
         tok(TokenKind.LBrace), // A left brace ({) ...
-        opt_sc(tok(TokenKind.Space)) // ...followed by some optional space...
+        TRIVIA // ...followed by some trivia...
       ),
       opt_sc(
         // ...followed by an optional list of properties...
         list_sc(
           PROPERTY, //...containing properties...
-          tok(TokenKind.Space) // ...separated by linebreaks.
+          TRIVIA_SOME // ...separated by space or comments.
         )
       ),
       kright(
-        opt_sc(tok(TokenKind.Space)), // ..followed by some optional space...
+        TRIVIA, // ...followed by some trivia...
         tok(TokenKind.RBrace) // ...follwed by a right brace (}).
       )
     ),
@@ -161,12 +165,7 @@ OBJECT.setPattern(
   )
 );
 /** Key Values */
-KEY_VALUES.setPattern(
-  apply(
-    kmid(opt_sc(tok(TokenKind.Space)), PROPERTY, opt_sc(tok(TokenKind.Space))),
-    applyKeyValues
-  )
-);
+KEY_VALUES.setPattern(apply(kmid(TRIVIA, PROPERTY, TRIVIA), applyKeyValues));
 
 export function parseWith<TResult>(
   text: string,
