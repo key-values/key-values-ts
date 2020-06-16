@@ -1,5 +1,4 @@
 import {
-  buildLexer,
   expectEOF,
   expectSingleResult,
   rule,
@@ -15,6 +14,7 @@ import {
   kleft,
   kright,
 } from 'typescript-parsec';
+
 import {
   StringASTNode,
   PropertyASTNode,
@@ -23,28 +23,14 @@ import {
   ValueASTNode,
   KeyValuesASTNode,
 } from './ast_node';
+
 import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
 } from './ast_node_impl';
 
-enum TokenKind {
-  LBrace,
-  RBrace,
-  Space,
-  QuotedString,
-  UnquotedString,
-  DoubleQuote,
-}
-
-const lexer = buildLexer([
-  [true, /^\{/g, TokenKind.LBrace],
-  [true, /^\}/g, TokenKind.RBrace],
-  [true, /^\s+/g, TokenKind.Space],
-  [true, /^(?:\w|\d)*/g, TokenKind.UnquotedString],
-  [true, /^"(?:\w|\d|[ \t{}.,+*?])*"/g, TokenKind.QuotedString],
-]);
+import { TokenKind, lexer } from './lexer';
 
 export const STRING_UNQUOTED = rule<TokenKind, StringASTNode>();
 export const STRING_QUOTED = rule<TokenKind, StringASTNode>();
@@ -113,9 +99,7 @@ function applyProperty(
 function applyObject(
   values: [
     Token<TokenKind.LBrace>,
-    // Token<TokenKind.Whitespace>,
     PropertyASTNode[] | undefined,
-    // Token<TokenKind.Whitespace>,
     Token<TokenKind.RBrace>
   ]
 ): ObjectASTNode {
@@ -166,7 +150,7 @@ OBJECT.setPattern(
         )
       ),
       kright(
-        opt_sc(tok(TokenKind.Space)), // Some optional space...
+        opt_sc(tok(TokenKind.Space)), // ..followed by some optional space...
         tok(TokenKind.RBrace) // ...follwed by a right brace (}).
       )
     ),
