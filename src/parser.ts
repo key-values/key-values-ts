@@ -11,55 +11,49 @@ import {
   opt_sc,
   list_sc,
   kmid,
+  Parser,
+  kleft,
+  kright,
 } from 'typescript-parsec';
 import {
   StringASTNode,
-  NumberASTNode,
   PropertyASTNode,
   ObjectASTNode,
-  LiteralASTNode,
   KeyASTNode,
   ValueASTNode,
   KeyValuesASTNode,
 } from './ast_node';
 import {
-  NumberASTNodeImpl,
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
 } from './ast_node_impl';
 
 enum TokenKind {
-  UnquotedString,
-  QuotedString,
-  DoubleQuote,
   LBrace,
   RBrace,
   Space,
-  Whitespace,
-  Linebreak,
+  QuotedString,
+  UnquotedString,
+  DoubleQuote,
 }
 
 const lexer = buildLexer([
-  [true, /^(?:\w|\d|[_.#*+~-?])*/g, TokenKind.QuotedString],
-  [true, /^(?:\w|\d|[_.#*+~-? \t{}]|(?:\\["\\]))*/g, TokenKind.UnquotedString],
-  [true, /^"/g, TokenKind.DoubleQuote],
-  [true, /^{/g, TokenKind.LBrace],
-  [true, /^}/g, TokenKind.RBrace],
-  [false, /^[ \t]+/g, TokenKind.Space],
-  [false, /^\s*/g, TokenKind.Whitespace],
-  [false, /^\n+/g, TokenKind.Linebreak],
+  [true, /^\{/g, TokenKind.LBrace],
+  [true, /^\}/g, TokenKind.RBrace],
+  [true, /^\s+/g, TokenKind.Space],
+  [true, /^(?:\w|\d)*/g, TokenKind.UnquotedString],
+  [true, /^"(?:\w|\d|[ \t{}.,+*?])*"/g, TokenKind.QuotedString],
 ]);
 
-const STRING_UNQUOTED = rule<TokenKind, StringASTNode>();
-const STRING_QUOTED = rule<TokenKind, StringASTNode>();
-const STRING = rule<TokenKind, StringASTNode>();
-const LITERAL = rule<TokenKind, LiteralASTNode>();
-const KEY = rule<TokenKind, KeyASTNode>();
-const VALUE = rule<TokenKind, ValueASTNode>();
-const PROPERTY = rule<TokenKind, PropertyASTNode>();
-const OBJECT = rule<TokenKind, ObjectASTNode>();
-const KEY_VALUES = rule<TokenKind, KeyValuesASTNode>();
+export const STRING_UNQUOTED = rule<TokenKind, StringASTNode>();
+export const STRING_QUOTED = rule<TokenKind, StringASTNode>();
+export const STRING = rule<TokenKind, StringASTNode>();
+export const KEY = rule<TokenKind, KeyASTNode>();
+export const VALUE = rule<TokenKind, ValueASTNode>();
+export const PROPERTY = rule<TokenKind, PropertyASTNode>();
+export const OBJECT = rule<TokenKind, ObjectASTNode>();
+export const KEY_VALUES = rule<TokenKind, KeyValuesASTNode>();
 
 function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
   const node = new StringASTNodeImpl(
@@ -72,27 +66,17 @@ function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
   return node;
 }
 
-function applyQuoted(
-  value: [
-    Token<TokenKind.DoubleQuote>,
-    Token<TokenKind.QuotedString>,
-    Token<TokenKind.DoubleQuote>
-  ]
-): StringASTNode {
-  const str = value[1];
+function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNode {
+  const str = value.text.slice(1, value.text.length - 1);
   return new StringASTNodeImpl(
     undefined,
-    str.text,
-    str.pos.index - 1,
-    str.text.length + 2
+    str,
+    value.pos.index,
+    value.text.length
   );
 }
 
 function applyString(value: StringASTNode): StringASTNode {
-  return value;
-}
-
-function applyLiteral(value: LiteralASTNode): LiteralASTNode {
   return value;
 }
 
@@ -108,11 +92,10 @@ function applyProperty(
   values: [KeyASTNode, Token<TokenKind.Space>, ValueASTNode]
 ): PropertyASTNode {
   const key = values[0];
-  const space = values[1];
   const value = values[2];
 
   const offset = key.offset;
-  const length = key.length + space.text.length + value.length;
+  const length = value.offset + value.length - offset;
 
   const property = new PropertyASTNodeImpl(
     undefined,
@@ -130,15 +113,15 @@ function applyProperty(
 function applyObject(
   values: [
     Token<TokenKind.LBrace>,
-    Token<TokenKind.Whitespace>,
+    // Token<TokenKind.Whitespace>,
     PropertyASTNode[] | undefined,
-    Token<TokenKind.Whitespace>,
+    // Token<TokenKind.Whitespace>,
     Token<TokenKind.RBrace>
   ]
 ): ObjectASTNode {
   const lBrace = values[0];
-  const properties = values[2] || [];
-  const rBrace = values[4];
+  const properties = values[1] || [];
+  const rBrace = values[2];
 
   const offset = lBrace.pos.index;
   const length = rBrace.pos.index + 1 - offset;
@@ -156,24 +139,13 @@ function applyKeyValues(value: KeyValuesASTNode): KeyValuesASTNode {
 /** Unquoted string */
 STRING_UNQUOTED.setPattern(apply(tok(TokenKind.UnquotedString), applyUnquoted));
 /** Quoted string */
-STRING_QUOTED.setPattern(
-  apply(
-    seq(
-      tok(TokenKind.DoubleQuote), // quotation marks (")...
-      tok(TokenKind.QuotedString), // ...followed by a string...
-      tok(TokenKind.DoubleQuote) // ...followed by quotation marks (")
-    ),
-    applyQuoted
-  )
-);
+STRING_QUOTED.setPattern(apply(tok(TokenKind.QuotedString), applyQuoted));
 /** String */
 STRING.setPattern(apply(alt(STRING_UNQUOTED, STRING_QUOTED), applyString));
-/** Literal */
-LITERAL.setPattern(apply(STRING, applyLiteral));
 /** Key */
 KEY.setPattern(apply(STRING, applyKey));
 /** Value */
-VALUE.setPattern(apply(alt(LITERAL, OBJECT), applyValue));
+VALUE.setPattern(apply(alt(STRING, OBJECT), applyValue));
 /** Property */
 PROPERTY.setPattern(
   apply(seq(KEY, tok(TokenKind.Space), VALUE), applyProperty)
@@ -182,21 +154,21 @@ PROPERTY.setPattern(
 OBJECT.setPattern(
   apply(
     seq(
-      tok(TokenKind.LBrace), // A left brace ({) ...
-      tok(TokenKind.Whitespace), // ...followed by some whitespace...
+      kleft(
+        tok(TokenKind.LBrace), // A left brace ({) ...
+        opt_sc(tok(TokenKind.Space)) // ...followed by some optional space...
+      ),
       opt_sc(
-        // ...follwed by an optional list of properties...
+        // ...followed by an optional list of properties...
         list_sc(
           PROPERTY, //...containing properties...
-          kmid(
-            tok(TokenKind.Whitespace),
-            tok(TokenKind.Linebreak), // ...seperated by linebreaks.
-            tok(TokenKind.Whitespace)
-          )
+          tok(TokenKind.Space) // ...separated by linebreaks.
         )
       ),
-      tok(TokenKind.Whitespace), //...followed by some whitespace...
-      tok(TokenKind.RBrace) // ...followed by a right brace (}).
+      kright(
+        opt_sc(tok(TokenKind.Space)), // Some optional space...
+        tok(TokenKind.RBrace) // ...follwed by a right brace (}).
+      )
     ),
     applyObject
   )
@@ -204,11 +176,18 @@ OBJECT.setPattern(
 /** Key Values */
 KEY_VALUES.setPattern(
   apply(
-    kmid(tok(TokenKind.Whitespace), PROPERTY, tok(TokenKind.Whitespace)),
+    kmid(opt_sc(tok(TokenKind.Space)), PROPERTY, opt_sc(tok(TokenKind.Space))),
     applyKeyValues
   )
 );
 
-function parseAST(text: string): KeyValuesASTNode {
-  return expectSingleResult(expectEOF(KEY_VALUES.parse(lexer.parse(text))));
+export function parseWith<TResult>(
+  text: string,
+  parser: Parser<TokenKind, TResult>
+): TResult {
+  return expectSingleResult(expectEOF(parser.parse(lexer.parse(text))));
+}
+
+export function parseAsAST(text: string): KeyValuesASTNode {
+  return parseWith(text, KEY_VALUES);
 }

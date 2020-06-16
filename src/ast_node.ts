@@ -3,7 +3,7 @@ export type KeyValuesASTNode = PropertyASTNode;
 export type ASTNode = BaseASTNode;
 
 export interface BaseASTNode {
-  readonly type: 'object' | 'property' | 'string' | 'number';
+  readonly type: 'object' | 'property' | 'string';
   parent?: ASTNode;
   readonly offset: number;
   readonly length: number;
@@ -12,12 +12,12 @@ export interface BaseASTNode {
 }
 
 export type KeyASTNode = StringASTNode;
-export type ValueASTNode = LiteralASTNode | ObjectASTNode;
+export type ValueASTNode = StringASTNode | ObjectASTNode;
 
 export interface PropertyASTNode extends BaseASTNode {
   readonly type: 'property';
   readonly keyNode: KeyASTNode;
-  readonly valueNode?: ValueASTNode;
+  readonly valueNode: ValueASTNode;
   readonly children: ASTNode[];
 }
 
@@ -27,19 +27,8 @@ export interface ObjectASTNode extends BaseASTNode {
   readonly children: ASTNode[];
 }
 
-export interface LiteralASTNode extends BaseASTNode {
-  readonly type: 'string' | 'number';
-  readonly isQuoted: boolean;
-  readonly value: string | number;
-}
-
-export interface StringASTNode extends LiteralASTNode {
+export interface StringASTNode extends BaseASTNode {
   readonly type: 'string';
+  readonly isQuoted: boolean;
   readonly value: string;
-}
-
-export interface NumberASTNode extends LiteralASTNode {
-  readonly type: 'number';
-  readonly value: number;
-  readonly isInteger: boolean;
 }

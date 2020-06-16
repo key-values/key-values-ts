@@ -6,15 +6,20 @@
   "author": "Tim Jentzsch",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/parser": "^3.3.0",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "2.0.5"
+    "jest": "^26.0.1",
+    "prettier": "2.0.5",
+    "ts-jest": "^26.1.0",
+    "typescript": "^3.9.5"
   },
   "dependencies": {
     "typescript-parsec": "^0.3.1"
