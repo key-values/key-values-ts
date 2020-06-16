@@ -5,7 +5,33 @@ import {
   PropertyASTNode,
   ValueASTNode,
   KeyASTNode,
+  NodePosition,
 } from './ast_node';
+
+export class NodePositionImpl implements NodePosition {
+  public offset: number;
+  public length: number;
+  public columnBegin: number;
+  public rowBegin: number;
+  public columnEnd: number;
+  public rowEnd: number;
+
+  constructor(
+    offset: number,
+    length: number,
+    rowBegin: number,
+    columnBegin: number,
+    rowEnd: number,
+    columnEnd: number
+  ) {
+    this.offset = offset;
+    this.length = length;
+    this.rowBegin = rowBegin;
+    this.columnBegin = columnBegin;
+    this.rowEnd = rowEnd;
+    this.columnEnd = columnEnd;
+  }
+}
 
 export abstract class ASTNodeImpl {
   public abstract readonly type:
@@ -15,13 +41,11 @@ export abstract class ASTNodeImpl {
     | 'string'
     | 'number';
 
-  public offset: number;
-  public length: number;
+  public pos: NodePosition;
   public parent: ASTNode | undefined;
 
-  constructor(parent: ASTNode | undefined, offset: number, length = 0) {
-    this.offset = offset;
-    this.length = length;
+  constructor(parent: ASTNode | undefined, pos: NodePosition) {
+    this.pos = pos;
     this.parent = parent;
   }
 
@@ -31,7 +55,7 @@ export abstract class ASTNodeImpl {
 
   public toString(): string {
     const parentStr = this.parent ? ` parent: {${this.parent.toString()}}` : '';
-    return `type: ${this.type} (${this.offset}/${this.length})${parentStr}`;
+    return `type: ${this.type} (${this.pos.offset}/${this.pos.length})${parentStr}`;
   }
 }
 
@@ -43,10 +67,9 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
   constructor(
     parent: ASTNode | undefined,
     strValue: string,
-    offset: number,
-    length?: number
+    pos: NodePosition
   ) {
-    super(parent, offset, length);
+    super(parent, pos);
     this.value = strValue;
     this.isQuoted = true;
   }
@@ -62,10 +85,9 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
     parent: ObjectASTNode | undefined,
     keyNode: KeyASTNode,
     valueNode: ValueASTNode,
-    offset: number,
-    length?: number
+    pos: NodePosition
   ) {
-    super(parent, offset, length);
+    super(parent, pos);
     this.keyNode = keyNode;
     this.valueNode = valueNode;
   }
@@ -78,10 +100,9 @@ export class ObjectASTNodeImpl extends ASTNodeImpl implements ObjectASTNode {
   constructor(
     parent: ASTNode | undefined,
     properties: PropertyASTNode[],
-    offset: number,
-    length?: number
+    pos: NodePosition
   ) {
-    super(parent, offset, length);
+    super(parent, pos);
     this.properties = properties;
   }
 

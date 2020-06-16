@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ASTNode, KeyValuesASTNode } from './ast_node';
 import { parseWith, KEY_VALUES } from './parser';
 import {
@@ -12,14 +14,13 @@ function parseAsAST(text: string): KeyValuesASTNode {
 }
 
 /** Converts a KeyValues string into an object. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parse(text: string): any {
   const ast = parseAsAST(text);
   return parseNode(ast);
 }
 
 /** Converts a JavaScript value into a KeyValues string. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function stringify(key: string, value: any): string {
   throw new Error('Not implemented');
 }
@@ -29,7 +30,6 @@ function parseNode(node: ASTNode): unknown {
   if (node instanceof StringASTNodeImpl) {
     return node.value;
   } else if (node instanceof ObjectASTNodeImpl) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const obj: any = {};
     node.properties.forEach((property) => {
       const value = parseNode(property.valueNode);
@@ -37,7 +37,6 @@ function parseNode(node: ASTNode): unknown {
     });
     return obj;
   } else if (node instanceof PropertyASTNodeImpl) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const obj: any = {};
     obj[node.keyNode.value] = parseNode(node.valueNode);
     return obj;

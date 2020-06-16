@@ -9,6 +9,7 @@ import {
   OBJECT,
   KEY_VALUES,
 } from './parser';
+import { ASTNode } from './ast_node';
 
 describe('Parser', () => {
   // Unquoted string
@@ -20,6 +21,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 5);
     });
   });
   // Quoted string
@@ -31,6 +33,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 7);
     });
     test('should parse string with spacing', () => {
       const text = `"value 1 and 2"`;
@@ -39,6 +42,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value 1 and 2');
+      assertSingleLinePos(result, 15);
     });
     test('should allow escaped double quote', () => {
       const text = `"value\\"WithQuote"`;
@@ -47,6 +51,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value"WithQuote');
+      assertSingleLinePos(result, 18);
     });
   });
   // String
@@ -58,6 +63,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 5);
     });
     test('should parse simple quotedstring', () => {
       const text = `"value"`;
@@ -66,6 +72,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 7);
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
@@ -74,6 +81,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value 1 and 2');
+      assertSingleLinePos(result, 15);
     });
   });
   // Key
@@ -85,6 +93,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 5);
     });
     test('should parse simple quotedstring', () => {
       const text = `"value"`;
@@ -93,6 +102,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 7);
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
@@ -101,6 +111,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy;
       expect(result.value).toEqual('value 1 and 2');
+      assertSingleLinePos(result, 15);
     });
   });
   // Object
@@ -111,6 +122,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('object');
       expect(result.properties).toEqual([]);
+      assertSingleLinePos(result, 2);
     });
     test('should parse simple single string object', () => {
       const text = `{ "key" "value" }`;
@@ -118,6 +130,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(1);
+      assertSingleLinePos(result, 17);
 
       const property = result.properties[0];
       expect(property.keyNode.value).toEqual('key');
@@ -133,6 +146,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
+      assertStartPos(result, 82, 5, 8);
 
       const property1 = result.properties[0];
       expect(property1.keyNode.value).toEqual('key1');
@@ -156,6 +170,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
+      assertStartPos(result, 146, 7, 8);
 
       const property1 = result.properties[0];
       expect(property1.keyNode.value).toEqual('key1');
@@ -180,6 +195,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
+      assertStartPos(result, 145, 8, 8);
 
       const property1 = result.properties[0];
       expect(property1.keyNode.value).toEqual('key1');
@@ -187,6 +203,9 @@ describe('Parser', () => {
       const property2 = result.properties[1];
       expect(property2.keyNode.value).toEqual('key2');
       expect(property2.valueNode.type).toEqual('object');
+      assertPos(property2, 35, 78, 3, 9, 6, 10);
+      const obj = property2.valueNode;
+      assertPos(obj, 42, 71, 3, 16, 6, 10);
       const property3 = result.properties[2];
       expect(property3.keyNode.value).toEqual('key3');
       expect(property3.valueNode?.value).toEqual('value3');
@@ -200,6 +219,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 5);
     });
     test('should parse simple quotedstring', () => {
       const text = `"value"`;
@@ -207,6 +227,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value');
+      assertSingleLinePos(result, 7);
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
@@ -214,6 +235,7 @@ describe('Parser', () => {
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value 1 and 2');
+      assertSingleLinePos(result, 15);
     });
   });
   // Property
@@ -225,6 +247,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
+      assertSingleLinePos(result, 13);
     });
     test('should parse empty object property', () => {
       const text = `"key" {}`;
@@ -233,6 +256,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.type).toEqual('object');
+      assertSingleLinePos(result, 8);
     });
     test('should parse simple single string object property', () => {
       const text = `"key1" { "key1.1" "value1.1" }`;
@@ -241,6 +265,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key1');
       expect(result.valueNode.type).toEqual('object');
+      assertSingleLinePos(result, 30);
     });
   });
   // KeyValues
@@ -252,6 +277,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
+      assertSingleLinePos(result, 13);
     });
     test('should parse object property', () => {
       const text = `"key" {}`;
@@ -260,6 +286,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.type).toEqual('object');
+      assertSingleLinePos(result, 8);
     });
     test('should allow surrounding whitespace', () => {
       const text = `  
@@ -269,6 +296,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
+      assertPos(result, 12, 13, 2, 10, 2, 23);
     });
     test('should allow surrounding comments', () => {
       const text = `
@@ -280,6 +308,40 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
+      assertPos(result, 30, 13, 3, 9, 3, 22);
     });
   });
 });
+
+/** Asserts that the position data of a node is correct. */
+function assertPos(
+  node: ASTNode,
+  offset: number,
+  length: number,
+  rowBegin: number,
+  columnBegin: number,
+  rowEnd: number,
+  columnEnd: number
+) {
+  expect(node.pos.offset).toBe(offset);
+  expect(node.pos.length).toBe(length);
+  expect(node.pos.rowBegin).toBe(rowBegin);
+  expect(node.pos.columnBegin).toBe(columnBegin);
+  expect(node.pos.rowEnd).toBe(rowEnd);
+  expect(node.pos.columnEnd).toBe(columnEnd);
+}
+
+/** Asserts that the position of a node at the start of the text is correct. */
+function assertStartPos(
+  node: ASTNode,
+  length: number,
+  rowEnd: number,
+  columnEnd: number
+) {
+  assertPos(node, 0, length, 1, 1, rowEnd, columnEnd);
+}
+
+/** Asserts that the position data of a single-line node is correct. */
+function assertSingleLinePos(node: ASTNode, length: number) {
+  assertStartPos(node, length, 1, length + 1);
+}

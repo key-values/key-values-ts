@@ -29,6 +29,7 @@ import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
+  NodePositionImpl,
 } from './ast_node_impl';
 
 import { TokenKind, lexer } from './lexer';
@@ -46,27 +47,36 @@ export const OBJECT = rule<TokenKind, ObjectASTNode>();
 export const KEY_VALUES = rule<TokenKind, KeyValuesASTNode>();
 
 function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
-  const node = new StringASTNodeImpl(
-    undefined,
-    value.text,
+  const pos = new NodePositionImpl(
     value.pos.index,
-    value.text.length
+    value.text.length,
+    value.pos.rowBegin,
+    value.pos.columnBegin,
+    value.pos.rowEnd,
+    value.pos.columnEnd
   );
+
+  const node = new StringASTNodeImpl(undefined, value.text, pos);
   node.isQuoted = false;
   return node;
 }
 
 function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNode {
+  const pos = new NodePositionImpl(
+    value.pos.index,
+    value.text.length,
+    value.pos.rowBegin,
+    value.pos.columnBegin,
+    value.pos.rowEnd,
+    value.pos.columnEnd
+  );
+
   // Extract string value
   let str = value.text.slice(1, value.text.length - 1);
   // Resolve escaped quotes
   str = str.replace(/\\"/, '"');
-  return new StringASTNodeImpl(
-    undefined,
-    str,
-    value.pos.index,
-    value.text.length
-  );
+
+  return new StringASTNodeImpl(undefined, str, pos);
 }
 
 function applyString(value: StringASTNode): StringASTNode {
@@ -87,16 +97,16 @@ function applyProperty(
   const key = values[0];
   const value = values[2];
 
-  const offset = key.offset;
-  const length = value.offset + value.length - offset;
-
-  const property = new PropertyASTNodeImpl(
-    undefined,
-    key,
-    value,
-    offset,
-    length
+  const pos = new NodePositionImpl(
+    key.pos.offset,
+    value.pos.offset + value.pos.length - key.pos.offset,
+    key.pos.rowBegin,
+    key.pos.columnBegin,
+    value.pos.rowEnd,
+    value.pos.columnEnd
   );
+
+  const property = new PropertyASTNodeImpl(undefined, key, value, pos);
   key.parent = property;
   value.parent = property;
 
@@ -114,10 +124,16 @@ function applyObject(
   const properties = values[1] || [];
   const rBrace = values[2];
 
-  const offset = lBrace.pos.index;
-  const length = rBrace.pos.index + 1 - offset;
+  const pos = new NodePositionImpl(
+    lBrace.pos.index,
+    rBrace.pos.index + 1 - lBrace.pos.index,
+    lBrace.pos.rowBegin,
+    lBrace.pos.columnBegin,
+    rBrace.pos.rowEnd,
+    rBrace.pos.columnEnd
+  );
 
-  const object = new ObjectASTNodeImpl(undefined, properties, offset, length);
+  const object = new ObjectASTNodeImpl(undefined, properties, pos);
   properties.forEach((property) => (property.parent = object));
 
   return object;
