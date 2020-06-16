@@ -1,5 +1,4 @@
 import {
-  parseAsAST,
   parseWith,
   STRING_UNQUOTED,
   STRING_QUOTED,
@@ -8,7 +7,7 @@ import {
   VALUE,
   KEY,
   OBJECT,
-  parse,
+  KEY_VALUES,
 } from './parser';
 
 describe('Parser', () => {
@@ -248,7 +247,7 @@ describe('Parser', () => {
   describe('key values', () => {
     test('should parse simple string property', () => {
       const text = `"key" "value"`;
-      const result = parseAsAST(text);
+      const result = parseWith(text, KEY_VALUES);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -256,7 +255,7 @@ describe('Parser', () => {
     });
     test('should parse object property', () => {
       const text = `"key" {}`;
-      const result = parseAsAST(text);
+      const result = parseWith(text, KEY_VALUES);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -266,8 +265,7 @@ describe('Parser', () => {
       const text = `  
          "key" "value"   
          `;
-      const result = parseAsAST(text);
-
+      const result = parseWith(text, KEY_VALUES);
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
@@ -277,38 +275,11 @@ describe('Parser', () => {
         // Comment 1
         "key" "value"   // Comment 2
         // Comment 3`;
-      const result = parseAsAST(text);
+      const result = parseWith(text, KEY_VALUES);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
-    });
-  });
-  describe('parse', () => {
-    test('should parse nested text', () => {
-      const text = `"key" { 
-        "key1" "value1"
-        "key2" {
-          "key2.1" "value2.1"
-          "key2.2" "value2.2"
-        }
-        "key3" "value3"
-      }`;
-
-      const result = parse(text);
-
-      const expected = {
-        key: {
-          key1: 'value1',
-          key2: {
-            'key2.1': 'value2.1',
-            'key2.2': 'value2.2',
-          },
-          key3: 'value3',
-        },
-      };
-
-      expect(result).toEqual(expected);
     });
   });
 });
