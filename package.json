@@ -5,9 +5,24 @@
   "main": "src/main.ts",
   "author": "Tim Jentzsch",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/key-values/key-values-ts"
+  },
+  "bugs": {
+    "url": "https://github.com/key-values/key-values-ts/issues"
+  },
+  "homepage": "https://github.com/key-values/key-values-ts",
+  "engines": {
+    "node": "^12",
+    "yarn": "^1.16.0"
+  },
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "eslint \"src/**/*.ts\" --fix"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
