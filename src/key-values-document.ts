@@ -5,7 +5,7 @@ import NodeStringifier from './node_stringifier';
 import ObjectParser from './object_parser';
 import { ASTNode } from './ast_node';
 
-export class KeyValuesDocument {
+export default class KeyValuesDocument {
   constructor(public readonly root: ASTNode | undefined) {}
 
   /** Creates a KeyValues document from a text. */

@@ -1,4 +1,4 @@
-import { KeyValuesDocument } from './key-values-document';
+import KeyValuesDocument from './key-values-document';
 
 /** Converts a KeyValues string into an object. */
 function parse(text: string): unknown {
