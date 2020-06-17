@@ -17,19 +17,13 @@ import {
 } from 'typescript-parsec';
 
 import {
-  StringASTNode,
-  PropertyASTNode,
-  ObjectASTNode,
-  KeyASTNode,
-  ValueASTNode,
-  KeyValuesASTNode,
-} from './ast_node';
-
-import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
   NodePositionImpl,
+  KeyASTNodeImpl,
+  ValueASTNodeImpl,
+  KeyValuesASTNodeImpl,
 } from './ast_node_impl';
 
 import { TokenKind, lexer } from './lexer';
@@ -37,16 +31,18 @@ import { TokenKind, lexer } from './lexer';
 export const TRIVIA_BASE = alt(tok(TokenKind.Space), tok(TokenKind.Comment));
 export const TRIVIA = rep_sc(TRIVIA_BASE);
 export const TRIVIA_SOME = seq(TRIVIA_BASE, TRIVIA);
-export const STRING_UNQUOTED = rule<TokenKind, StringASTNode>();
-export const STRING_QUOTED = rule<TokenKind, StringASTNode>();
-export const STRING = rule<TokenKind, StringASTNode>();
-export const KEY = rule<TokenKind, KeyASTNode>();
-export const VALUE = rule<TokenKind, ValueASTNode>();
-export const PROPERTY = rule<TokenKind, PropertyASTNode>();
-export const OBJECT = rule<TokenKind, ObjectASTNode>();
-export const KEY_VALUES = rule<TokenKind, KeyValuesASTNode>();
+export const STRING_UNQUOTED = rule<TokenKind, StringASTNodeImpl>();
+export const STRING_QUOTED = rule<TokenKind, StringASTNodeImpl>();
+export const STRING = rule<TokenKind, StringASTNodeImpl>();
+export const KEY = rule<TokenKind, KeyASTNodeImpl>();
+export const VALUE = rule<TokenKind, ValueASTNodeImpl>();
+export const PROPERTY = rule<TokenKind, PropertyASTNodeImpl>();
+export const OBJECT = rule<TokenKind, ObjectASTNodeImpl>();
+export const KEY_VALUES = rule<TokenKind, KeyValuesASTNodeImpl>();
 
-function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
+function applyUnquoted(
+  value: Token<TokenKind.UnquotedString>
+): StringASTNodeImpl {
   const pos = new NodePositionImpl(
     value.pos.index,
     value.text.length,
@@ -61,7 +57,7 @@ function applyUnquoted(value: Token<TokenKind.UnquotedString>): StringASTNode {
   return node;
 }
 
-function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNode {
+function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNodeImpl {
   const pos = new NodePositionImpl(
     value.pos.index,
     value.text.length,
@@ -79,23 +75,25 @@ function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNode {
   return new StringASTNodeImpl(undefined, str, pos);
 }
 
-function applyString(value: StringASTNode): StringASTNode {
+function applyString(value: StringASTNodeImpl): StringASTNodeImpl {
   return value;
 }
 
-function applyKey(value: KeyASTNode): KeyASTNode {
+function applyKey(value: KeyASTNodeImpl): KeyASTNodeImpl {
   return value;
 }
 
-function applyValue(value: ValueASTNode): ValueASTNode {
+function applyValue(value: ValueASTNodeImpl): ValueASTNodeImpl {
   return value;
 }
 
 function applyProperty(
-  values: [KeyASTNode, Token<TokenKind.Space>, ValueASTNode]
-): PropertyASTNode {
+  values: [KeyASTNodeImpl, Token<TokenKind.Space>, ValueASTNodeImpl]
+): PropertyASTNodeImpl {
   const key = values[0];
   const value = values[2];
+
+  if (!key.pos || !value.pos) throw new Error('Missing position data.');
 
   const pos = new NodePositionImpl(
     key.pos.offset,
@@ -107,8 +105,6 @@ function applyProperty(
   );
 
   const property = new PropertyASTNodeImpl(undefined, key, value, pos);
-  key.parent = property;
-  value.parent = property;
 
   return property;
 }
@@ -116,10 +112,10 @@ function applyProperty(
 function applyObject(
   values: [
     Token<TokenKind.LBrace>,
-    PropertyASTNode[] | undefined,
+    PropertyASTNodeImpl[] | undefined,
     Token<TokenKind.RBrace>
   ]
-): ObjectASTNode {
+): ObjectASTNodeImpl {
   const lBrace = values[0];
   const properties = values[1] || [];
   const rBrace = values[2];
@@ -139,7 +135,7 @@ function applyObject(
   return object;
 }
 
-function applyKeyValues(value: KeyValuesASTNode): KeyValuesASTNode {
+function applyKeyValues(value: KeyValuesASTNodeImpl): KeyValuesASTNodeImpl {
   return value;
 }
 

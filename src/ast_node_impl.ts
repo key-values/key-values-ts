@@ -33,6 +33,10 @@ export class NodePositionImpl implements NodePosition {
   }
 }
 
+export type KeyValuesASTNodeImpl = PropertyASTNodeImpl;
+export type KeyASTNodeImpl = StringASTNodeImpl;
+export type ValueASTNodeImpl = StringASTNodeImpl | ObjectASTNodeImpl;
+
 export abstract class ASTNodeImpl {
   public abstract readonly type:
     | 'object'
@@ -41,10 +45,10 @@ export abstract class ASTNodeImpl {
     | 'string'
     | 'number';
 
-  public pos: NodePosition;
+  public pos?: NodePosition;
   public parent: ASTNode | undefined;
 
-  constructor(parent: ASTNode | undefined, pos: NodePosition) {
+  constructor(parent: ASTNode | undefined, pos?: NodePosition) {
     this.pos = pos;
     this.parent = parent;
   }
@@ -55,7 +59,7 @@ export abstract class ASTNodeImpl {
 
   public toString(): string {
     const parentStr = this.parent ? ` parent: {${this.parent.toString()}}` : '';
-    return `type: ${this.type} (${this.pos.offset}/${this.pos.length})${parentStr}`;
+    return `type: ${this.type} (${this.pos?.offset}/${this.pos?.length})${parentStr}`;
   }
 }
 
@@ -67,7 +71,7 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
   constructor(
     parent: ASTNode | undefined,
     strValue: string,
-    pos: NodePosition
+    pos?: NodePosition
   ) {
     super(parent, pos);
     this.value = strValue;
@@ -83,13 +87,15 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
 
   constructor(
     parent: ObjectASTNode | undefined,
-    keyNode: KeyASTNode,
-    valueNode: ValueASTNode,
-    pos: NodePosition
+    keyNode: KeyASTNodeImpl,
+    valueNode: ValueASTNodeImpl,
+    pos?: NodePosition
   ) {
     super(parent, pos);
     this.keyNode = keyNode;
+    keyNode.parent = this;
     this.valueNode = valueNode;
+    valueNode.parent = this;
   }
 }
 
@@ -99,11 +105,12 @@ export class ObjectASTNodeImpl extends ASTNodeImpl implements ObjectASTNode {
 
   constructor(
     parent: ASTNode | undefined,
-    properties: PropertyASTNode[],
-    pos: NodePosition
+    properties: PropertyASTNodeImpl[],
+    pos?: NodePosition
   ) {
     super(parent, pos);
     this.properties = properties;
+    properties.forEach((property) => (property.parent = this));
   }
 
   public get children(): ASTNode[] {
