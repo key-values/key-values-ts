@@ -6,7 +6,7 @@ import {
 } from './ast_node';
 
 /** Generates the specified amount of indention. */
-function genIndent(indent?: number) {
+function genIndent(indent?: number): string {
   if (!indent) return '';
 
   let indentStr = '';
