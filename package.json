@@ -30,6 +30,12 @@
     "format": "eslint \"src/**/*.ts\" --fix",
     "prepublish": "yarn lint && yarn build && yarn test"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "env FORCE_COLOR=1 yarn lint",
+      "pre-push": "env FORCE_COLOR=1 yarn build"
+    }
+  },
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
@@ -37,6 +43,7 @@
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "jest": "^26.0.1",
     "prettier": "2.0.5",
     "ts-jest": "^26.1.0",
