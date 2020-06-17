@@ -1,20 +1,25 @@
 {
   "name": "key-values-ts",
   "version": "0.1.0",
-  "description": "A TypeScript parser for the KeyValues data format.",
-  "main": "src/main.ts",
+  "description": "A TypeScript parser for the KeyValues data format (also called Valve Data Format).",
+  "keywords": [
+    "KeyValues",
+    "Valve Data Format",
+    "VDF",
+    "TypeScript",
+    "parser"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Tim Jentzsch",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/key-values/key-values-ts"
-  },
+  "repository": "github:key-values/key-values-ts",
   "bugs": {
     "url": "https://github.com/key-values/key-values-ts/issues"
   },
-  "homepage": "https://github.com/key-values/key-values-ts",
+  "homepage": "https://github.com/key-values/key-values-ts#readme",
   "engines": {
-    "node": "^12",
+    "node": ">=12",
     "yarn": "^1.16.0"
   },
   "scripts": {
@@ -22,7 +27,8 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint \"src/**/*.ts\"",
-    "format": "eslint \"src/**/*.ts\" --fix"
+    "format": "eslint \"src/**/*.ts\" --fix",
+    "prepublish": "yarn lint && yarn build && yarn test"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
