@@ -17,7 +17,8 @@ describe('KeyValues', () => {
   // Parse
   describe('parse', () => {
     test('should parse single-property object', () => {
-      const text = `"key" {
+      const text = `"key"
+      {
         "key 1" "value 1"
         "key 2" "value 2"
       }`;

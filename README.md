@@ -15,7 +15,8 @@ Coming soon.
 ```typescript
 import KeyValues from 'key-values-ts';
 
-const text = `"key" {
+const input = `"key"
+{
   "key 1" "value 1"
   "key 2" "value 2"
 }`;
@@ -27,5 +28,12 @@ const obj = KeyValues.parse(text);
 //     'key 1': 'value 1',
 //     'key 2': 'value 2'
 //   }
+// }
+
+const output = KeyValues.stringify(text);
+// "key"
+// {
+//   "key 1" "value 1"
+//   "key 2" "value 2"
 // }
 ```
