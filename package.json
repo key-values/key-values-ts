@@ -1,20 +1,25 @@
 {
   "name": "key-values-ts",
   "version": "0.1.0",
-  "description": "A TypeScript parser for the KeyValues data format.",
-  "main": "src/main.ts",
+  "description": "A TypeScript parser for the KeyValues data format (also called Valve Data Format).",
+  "keywords": [
+    "KeyValues",
+    "Valve Data Format",
+    "VDF",
+    "TypeScript",
+    "parser"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Tim Jentzsch",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/key-values/key-values-ts"
-  },
+  "repository": "github:key-values/key-values-ts",
   "bugs": {
     "url": "https://github.com/key-values/key-values-ts/issues"
   },
-  "homepage": "https://github.com/key-values/key-values-ts",
+  "homepage": "https://github.com/key-values/key-values-ts#readme",
   "engines": {
-    "node": "^12",
+    "node": ">=12",
     "yarn": "^1.16.0"
   },
   "scripts": {
@@ -22,7 +27,14 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint \"src/**/*.ts\"",
-    "format": "eslint \"src/**/*.ts\" --fix"
+    "format": "eslint \"src/**/*.ts\" --fix",
+    "prepublish": "yarn lint && yarn build && yarn test"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "env FORCE_COLOR=1 yarn lint",
+      "pre-push": "env FORCE_COLOR=1 yarn build"
+    }
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
@@ -31,6 +43,7 @@
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "jest": "^26.0.1",
     "prettier": "2.0.5",
     "ts-jest": "^26.1.0",

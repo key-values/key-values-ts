@@ -323,12 +323,12 @@ function assertPos(
   rowEnd: number,
   columnEnd: number
 ) {
-  expect(node.pos.offset).toBe(offset);
-  expect(node.pos.length).toBe(length);
-  expect(node.pos.rowBegin).toBe(rowBegin);
-  expect(node.pos.columnBegin).toBe(columnBegin);
-  expect(node.pos.rowEnd).toBe(rowEnd);
-  expect(node.pos.columnEnd).toBe(columnEnd);
+  expect(node.pos?.offset).toBe(offset);
+  expect(node.pos?.length).toBe(length);
+  expect(node.pos?.rowBegin).toBe(rowBegin);
+  expect(node.pos?.columnBegin).toBe(columnBegin);
+  expect(node.pos?.rowEnd).toBe(rowEnd);
+  expect(node.pos?.columnEnd).toBe(columnEnd);
 }
 
 /** Asserts that the position of a node at the start of the text is correct. */

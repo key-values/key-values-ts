@@ -20,8 +20,8 @@ export type ASTNode = BaseASTNode;
 
 export interface BaseASTNode {
   readonly type: 'object' | 'property' | 'string';
-  parent?: ASTNode;
-  readonly pos: NodePosition;
+  readonly parent?: ASTNode;
+  readonly pos?: NodePosition;
   readonly children?: ASTNode[];
   readonly value?: string | number | null;
 }

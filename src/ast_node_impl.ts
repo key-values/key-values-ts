@@ -33,20 +33,18 @@ export class NodePositionImpl implements NodePosition {
   }
 }
 
-export abstract class ASTNodeImpl {
-  public abstract readonly type:
-    | 'object'
-    | 'property'
-    | 'array'
-    | 'string'
-    | 'number';
+export type KeyValuesASTNodeImpl = PropertyASTNodeImpl;
+export type KeyASTNodeImpl = StringASTNodeImpl;
+export type ValueASTNodeImpl = StringASTNodeImpl | ObjectASTNodeImpl;
 
-  public pos: NodePosition;
+export abstract class ASTNodeImpl {
+  public abstract readonly type: 'object' | 'property' | 'string';
+
+  public pos?: NodePosition;
   public parent: ASTNode | undefined;
 
-  constructor(parent: ASTNode | undefined, pos: NodePosition) {
+  constructor(pos?: NodePosition) {
     this.pos = pos;
-    this.parent = parent;
   }
 
   public get children(): ASTNode[] {
@@ -55,7 +53,7 @@ export abstract class ASTNodeImpl {
 
   public toString(): string {
     const parentStr = this.parent ? ` parent: {${this.parent.toString()}}` : '';
-    return `type: ${this.type} (${this.pos.offset}/${this.pos.length})${parentStr}`;
+    return `type: ${this.type} (${this.pos?.offset}/${this.pos?.length})${parentStr}`;
   }
 }
 
@@ -64,12 +62,8 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
   public isQuoted: boolean;
   public value: string;
 
-  constructor(
-    parent: ASTNode | undefined,
-    strValue: string,
-    pos: NodePosition
-  ) {
-    super(parent, pos);
+  constructor(strValue: string, pos?: NodePosition) {
+    super(pos);
     this.value = strValue;
     this.isQuoted = true;
   }
@@ -82,28 +76,27 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
   public valueNode: ValueASTNode;
 
   constructor(
-    parent: ObjectASTNode | undefined,
-    keyNode: KeyASTNode,
-    valueNode: ValueASTNode,
-    pos: NodePosition
+    keyNode: KeyASTNodeImpl,
+    valueNode: ValueASTNodeImpl,
+    pos?: NodePosition
   ) {
-    super(parent, pos);
+    super(pos);
     this.keyNode = keyNode;
+    keyNode.parent = this;
     this.valueNode = valueNode;
+    valueNode.parent = this;
   }
 }
 
 export class ObjectASTNodeImpl extends ASTNodeImpl implements ObjectASTNode {
   public type: 'object' = 'object';
   public properties: PropertyASTNode[];
+  public value = undefined;
 
-  constructor(
-    parent: ASTNode | undefined,
-    properties: PropertyASTNode[],
-    pos: NodePosition
-  ) {
-    super(parent, pos);
+  constructor(properties: PropertyASTNodeImpl[], pos?: NodePosition) {
+    super(pos);
     this.properties = properties;
+    properties.forEach((property) => (property.parent = this));
   }
 
   public get children(): ASTNode[] {
