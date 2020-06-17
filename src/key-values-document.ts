@@ -4,6 +4,7 @@ import { parseWith, KEY_VALUES } from './parser';
 import NodeStringifier from './node_stringifier';
 import ObjectParser from './object_parser';
 import { ASTNode } from './ast_node';
+import { PropertyASTNodeImpl, ValueASTNodeImpl } from './ast_node_impl';
 
 export default class KeyValuesDocument {
   constructor(public readonly root: ASTNode | undefined) {}
@@ -17,6 +18,22 @@ export default class KeyValuesDocument {
 
   /** Creates a KeyValues document from an object. */
   public static fromObject(obj: unknown): KeyValuesDocument {
+    if (typeof obj === 'object' && !Array.isArray(obj) && obj !== null) {
+      const keys = Object.keys(obj);
+      // If the value is an object with a single property, extract it to retain the correct syntax
+      if (keys.length === 1) {
+        const dir = obj as Record<string, unknown>;
+        const key = keys[0];
+        const value = dir[keys[0]];
+        // Convert to nodes
+        const keyNode = ObjectParser.parseString(key);
+        const valueNode = ObjectParser.parse(value) as ValueASTNodeImpl;
+        const propertyNode = new PropertyASTNodeImpl(keyNode, valueNode);
+        // Create document
+        return new KeyValuesDocument(propertyNode);
+      }
+    }
+
     const root = ObjectParser.parse(obj);
 
     return new KeyValuesDocument(root);
