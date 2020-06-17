@@ -1,55 +1,21 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ASTNode, KeyValuesASTNode } from './ast_node';
-import { parseWith, KEY_VALUES } from './parser';
-import {
-  StringASTNodeImpl,
-  ObjectASTNodeImpl,
-  PropertyASTNodeImpl,
-} from './ast_node_impl';
-
-/** Converts a KeyValues string to a KeyValues abstract syntax tree (AST). */
-function parseAsAST(text: string): KeyValuesASTNode {
-  return parseWith(text, KEY_VALUES);
-}
+import { KeyValuesDocument } from './key-values-document';
 
 /** Converts a KeyValues string into an object. */
 function parse(text: string): any {
-  const ast = parseAsAST(text);
-  return parseNode(ast);
+  return KeyValuesDocument.fromText(text).toObject();
 }
 
 /** Converts a JavaScript value into a KeyValues string. */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function stringify(key: string, value: any): string {
+function stringify(value: any, key?: string): string {
   throw new Error('Not implemented');
-}
-
-/** Converts a given AST node to a JS object. */
-function parseNode(node: ASTNode): unknown {
-  if (node instanceof StringASTNodeImpl) {
-    return node.value;
-  } else if (node instanceof ObjectASTNodeImpl) {
-    const obj: any = {};
-    node.properties.forEach((property) => {
-      const value = parseNode(property.valueNode);
-      obj[property.keyNode.value] = value;
-    });
-    return obj;
-  } else if (node instanceof PropertyASTNodeImpl) {
-    const obj: any = {};
-    obj[node.keyNode.value] = parseNode(node.valueNode);
-    return obj;
-  } else {
-    throw new Error('Unexpected node type.');
-  }
 }
 
 const KeyValues = {
   parse,
   stringify,
-  parseAsAST,
-  parseNode,
 };
 
 export default KeyValues;
