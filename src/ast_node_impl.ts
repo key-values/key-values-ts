@@ -38,12 +38,7 @@ export type KeyASTNodeImpl = StringASTNodeImpl;
 export type ValueASTNodeImpl = StringASTNodeImpl | ObjectASTNodeImpl;
 
 export abstract class ASTNodeImpl {
-  public abstract readonly type:
-    | 'object'
-    | 'property'
-    | 'array'
-    | 'string'
-    | 'number';
+  public abstract readonly type: 'object' | 'property' | 'string';
 
   public pos?: NodePosition;
   public parent: ASTNode | undefined;
