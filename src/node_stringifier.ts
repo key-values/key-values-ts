@@ -57,7 +57,7 @@ function stringifyObjectNode(node: ObjectASTNode, indent?: number): string {
       // Multi-line object
       const properties = node.properties
         .map((property) => stringifyNode(property, (indent ?? 0) + 1))
-        .join('/n');
+        .join('\n');
 
       return `${indentStr}{\n${properties}\n${indentStr}}`;
     }
