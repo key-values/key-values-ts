@@ -27,21 +27,21 @@ describe('NodeParser', () => {
   // Object node
   describe('parseObjectNode', () => {
     test('should parse empty object', () => {
-      const node = new ObjectASTNodeImpl(undefined, []);
+      const node = new ObjectASTNodeImpl([]);
       const expected = {};
 
       expect(NodeParser.parseObjectNode(node)).toEqual(expected);
     });
     test('should parse simple object', () => {
       const property = createStringPropertyNode('key', 'value');
-      const node = new ObjectASTNodeImpl(undefined, [property]);
+      const node = new ObjectASTNodeImpl([property]);
 
       const expected = { key: 'value' };
 
       expect(NodeParser.parseObjectNode(node)).toEqual(expected);
     });
     test('should parse multi object', () => {
-      const node = new ObjectASTNodeImpl(undefined, [
+      const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         createStringPropertyNode('key2', 'value2'),
         createStringPropertyNode('key3', 'value3'),
@@ -56,12 +56,11 @@ describe('NodeParser', () => {
       expect(NodeParser.parseObjectNode(node)).toEqual(expected);
     });
     test('should parse nested object', () => {
-      const node = new ObjectASTNodeImpl(undefined, [
+      const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         new PropertyASTNodeImpl(
-          undefined,
           createStringNode('key2'),
-          new ObjectASTNodeImpl(undefined, [
+          new ObjectASTNodeImpl([
             createStringPropertyNode('key2.1', 'value2.1'),
             createStringPropertyNode('key2.2', 'value2.2'),
             createStringPropertyNode('key2.3', 'value2.3'),
@@ -89,7 +88,7 @@ describe('NodeParser', () => {
 
 /** Creates a simple string node. */
 function createStringNode(value: string): StringASTNodeImpl {
-  return new StringASTNodeImpl(undefined, value);
+  return new StringASTNodeImpl(value);
 }
 
 /** Creates a simple string property node. */
@@ -99,7 +98,7 @@ function createStringPropertyNode(
 ): PropertyASTNodeImpl {
   const keyNode = createStringNode(key);
   const valueNode = createStringNode(value);
-  const propertyNode = new PropertyASTNodeImpl(undefined, keyNode, valueNode);
+  const propertyNode = new PropertyASTNodeImpl(keyNode, valueNode);
 
   return propertyNode;
 }

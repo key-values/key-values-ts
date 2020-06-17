@@ -27,13 +27,13 @@ describe('NodeStringifier', () => {
   // Object node
   describe('stringifyObjectNode', () => {
     test('should stringify empty object', () => {
-      const node = new ObjectASTNodeImpl(undefined, []);
+      const node = new ObjectASTNodeImpl([]);
       const expected = '{}';
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
     test('should stringify single-line object', () => {
-      const node = new ObjectASTNodeImpl(undefined, [
+      const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key', 'value'),
       ]);
       const expected = '{ "key"\t"value" }';
@@ -41,7 +41,7 @@ describe('NodeStringifier', () => {
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
     test('should stringify multi-line object', () => {
-      const node = new ObjectASTNodeImpl(undefined, [
+      const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         createStringPropertyNode('key2', 'value2'),
         createStringPropertyNode('key3', 'value3'),
@@ -56,12 +56,11 @@ describe('NodeStringifier', () => {
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
     test('should stringify nested multi-line object', () => {
-      const node = new ObjectASTNodeImpl(undefined, [
+      const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         new PropertyASTNodeImpl(
-          undefined,
           createStringNode('key2'),
-          new ObjectASTNodeImpl(undefined, [
+          new ObjectASTNodeImpl([
             createStringPropertyNode('key2.1', 'value2.1'),
             createStringPropertyNode('key2.2', 'value2.2'),
           ])
@@ -88,7 +87,7 @@ describe('NodeStringifier', () => {
 
 /** Creates a simple string node. */
 function createStringNode(value: string): StringASTNodeImpl {
-  return new StringASTNodeImpl(undefined, value);
+  return new StringASTNodeImpl(value);
 }
 
 /** Creates a simple string property node. */
@@ -98,7 +97,7 @@ function createStringPropertyNode(
 ): PropertyASTNodeImpl {
   const keyNode = createStringNode(key);
   const valueNode = createStringNode(value);
-  const propertyNode = new PropertyASTNodeImpl(undefined, keyNode, valueNode);
+  const propertyNode = new PropertyASTNodeImpl(keyNode, valueNode);
 
   return propertyNode;
 }

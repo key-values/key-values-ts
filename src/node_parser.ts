@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   StringASTNode,
   PropertyASTNode,
@@ -6,28 +5,30 @@ import {
   ASTNode,
 } from './ast_node';
 
+export type KeyValuesObject = string | Record<string, unknown>;
+
 /** Converts a StringASTNode to a string. */
 function parseStringNode(node: StringASTNode): string {
   return node.value;
 }
 
 /** Converts a PropertyASTNode to an object. */
-function parsePropertyNode(node: PropertyASTNode): any {
+function parsePropertyNode(node: PropertyASTNode): Record<string, unknown> {
   // Determine key and value
   const key = node.keyNode.value;
   const value = parseNode(node.valueNode);
 
   // Create wrapper object
-  const obj: any = {};
+  const obj: Record<string, unknown> = {};
   obj[key] = value;
 
   return obj;
 }
 
 /** Converts an ObjectASTNode to an object. */
-function parseObjectNode(node: ObjectASTNode): any {
+function parseObjectNode(node: ObjectASTNode): Record<string, unknown> {
   // Create object
-  const obj: any = {};
+  const obj: Record<string, unknown> = {};
 
   // Populate with properties
   node.properties.forEach((property) => {
@@ -42,7 +43,7 @@ function parseObjectNode(node: ObjectASTNode): any {
 }
 
 /** Converts an ASTNode to an object. */
-function parseNode(node: ASTNode): any {
+function parseNode(node: ASTNode): KeyValuesObject {
   switch (node.type) {
     case 'string':
       return parseStringNode(node as StringASTNode);

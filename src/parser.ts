@@ -52,7 +52,7 @@ function applyUnquoted(
     value.pos.columnEnd
   );
 
-  const node = new StringASTNodeImpl(undefined, value.text, pos);
+  const node = new StringASTNodeImpl(value.text, pos);
   node.isQuoted = false;
   return node;
 }
@@ -72,7 +72,7 @@ function applyQuoted(value: Token<TokenKind.QuotedString>): StringASTNodeImpl {
   // Resolve escaped quotes
   str = str.replace(/\\"/, '"');
 
-  return new StringASTNodeImpl(undefined, str, pos);
+  return new StringASTNodeImpl(str, pos);
 }
 
 function applyString(value: StringASTNodeImpl): StringASTNodeImpl {
@@ -104,7 +104,7 @@ function applyProperty(
     value.pos.columnEnd
   );
 
-  const property = new PropertyASTNodeImpl(undefined, key, value, pos);
+  const property = new PropertyASTNodeImpl(key, value, pos);
 
   return property;
 }
@@ -129,7 +129,7 @@ function applyObject(
     rBrace.pos.columnEnd
   );
 
-  const object = new ObjectASTNodeImpl(undefined, properties, pos);
+  const object = new ObjectASTNodeImpl(properties, pos);
   properties.forEach((property) => (property.parent = object));
 
   return object;
