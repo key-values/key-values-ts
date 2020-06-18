@@ -2,8 +2,8 @@ import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
-} from './ast_node_impl';
-import ObjectParser from './object_parser';
+} from '../src/ast_node_impl';
+import ObjectParser from '../src/object_parser';
 
 describe('ObjectParser', () => {
   // String

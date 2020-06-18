@@ -1,5 +1,5 @@
-import KeyValues, { KeyValuesDocument } from './key_values';
-import { PropertyASTNodeImpl, StringASTNodeImpl } from './ast_node_impl';
+import KeyValues, { KeyValuesDocument } from '../src/key_values';
+import { PropertyASTNodeImpl, StringASTNodeImpl } from '../src/ast_node_impl';
 
 describe('KeyValues', () => {
   // KeyValues document

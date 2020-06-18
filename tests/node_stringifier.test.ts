@@ -2,8 +2,8 @@ import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
-} from './ast_node_impl';
-import NodeStringifier from './node_stringifier';
+} from '../src/ast_node_impl';
+import NodeStringifier from '../src/node_stringifier';
 
 describe('NodeStringifier', () => {
   // String node
