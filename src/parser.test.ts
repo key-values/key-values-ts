@@ -258,6 +258,22 @@ describe('Parser', () => {
       expect(result.valueNode.type).toEqual('object');
       assertSingleLinePos(result, 8);
     });
+    test('should allow comments between key and string value', () => {
+      const text = `"key"// Comment\n"value"`;
+      const result = parseWith(text, PROPERTY);
+
+      expect(result.type).toEqual('property');
+      expect(result.keyNode.value).toEqual('key');
+      expect(result.valueNode.value).toEqual('value');
+    });
+    test('should allow comments between key and object value', () => {
+      const text = `"key"// Comment\n{ "key1"\t"value1" }`;
+      const result = parseWith(text, PROPERTY);
+
+      expect(result.type).toEqual('property');
+      expect(result.keyNode.value).toEqual('key');
+      expect(result.valueNode.type).toEqual('object');
+    });
     test('should parse simple single string object property', () => {
       const text = `"key1" { "key1.1" "value1.1" }`;
       const result = parseWith(text, PROPERTY);
