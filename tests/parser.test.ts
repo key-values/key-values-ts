@@ -8,8 +8,8 @@ import {
   KEY,
   OBJECT,
   KEY_VALUES,
-} from './parser';
-import { ASTNode } from './ast_node';
+} from '../src/parser';
+import { ASTNode } from '../src/ast_node';
 
 describe('Parser', () => {
   // Unquoted string
