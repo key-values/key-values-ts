@@ -2,6 +2,8 @@ node_modules
 tests
 src
 coverage
+yarn-error.log
+tsconfig.json
 .github
 .vscode
 .eslintrc.json
