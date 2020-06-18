@@ -1,2 +1,8 @@
 node_modules
+tests
+src
 coverage
+.github
+.vscode
+.eslintrc.json
+.prettierrc.json
