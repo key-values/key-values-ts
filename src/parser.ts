@@ -88,10 +88,10 @@ function applyValue(value: ValueASTNodeImpl): ValueASTNodeImpl {
 }
 
 function applyProperty(
-  values: [KeyASTNodeImpl, Token<TokenKind.Space>, ValueASTNodeImpl]
+  values: [KeyASTNodeImpl, ValueASTNodeImpl]
 ): PropertyASTNodeImpl {
   const key = values[0];
-  const value = values[2];
+  const value = values[1];
 
   if (!key.pos || !value.pos) throw new Error('Missing position data.');
 
@@ -150,9 +150,7 @@ KEY.setPattern(apply(STRING, applyKey));
 /** Value */
 VALUE.setPattern(apply(alt(STRING, OBJECT), applyValue));
 /** Property */
-PROPERTY.setPattern(
-  apply(seq(KEY, tok(TokenKind.Space), VALUE), applyProperty)
-);
+PROPERTY.setPattern(apply(seq(kleft(KEY, TRIVIA), VALUE), applyProperty));
 /** Object */
 OBJECT.setPattern(
   apply(
