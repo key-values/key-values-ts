@@ -84,3 +84,28 @@ function nextParentChild(node: ASTNode): ASTNode | null {
     return null;
   }
 }
+
+/** Finds the deepest AST node at the given offset. */
+export function findAtOffset(node: ASTNode, offset: number): ASTNode | null {
+  // Check if the offset is contained in the node
+  if (
+    node.pos &&
+    node.pos.offset <= offset &&
+    node.pos.offset + node.pos.length >= offset
+  ) {
+    let result = node;
+    if (node.children) {
+      // Check if the offset is contained in a child
+      node.children.forEach((child) => {
+        const childResult = findAtOffset(child, offset);
+        if (childResult) {
+          result = childResult;
+          return;
+        }
+      });
+    }
+    return result;
+  } else {
+    return null;
+  }
+}
