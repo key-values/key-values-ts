@@ -4,7 +4,7 @@ import {
   ObjectASTNodeImpl,
   NodePositionImpl,
 } from '../src/ast_node_impl';
-import { next, findAtOffset } from '../src/ast_node';
+import { next, findAtOffset, findAtCell } from '../src/ast_node';
 
 describe('ASTNode', () => {
   // Next
@@ -163,6 +163,119 @@ describe('ASTNode', () => {
         );
 
         expect(findAtOffset(obj, 21)).toBe(obj);
+      });
+    });
+  });
+  // Find at cell
+  describe('findAtCell', () => {
+    describe('string node', () => {
+      test('should be string for cell in string', () => {
+        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+
+        expect(findAtCell(str, 1, 1)).toBe(str);
+        expect(findAtCell(str, 1, 4)).toBe(str);
+        expect(findAtCell(str, 1, 8)).toBe(str);
+      });
+      test('should be null for cell before string', () => {
+        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+
+        expect(findAtCell(str, 1, 0)).toBe(null);
+        expect(findAtCell(str, 0, 5)).toBe(null);
+      });
+      test('should be null for cell after string', () => {
+        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+
+        expect(findAtCell(str, 1, 9)).toBe(null);
+        expect(findAtCell(str, 2, 5)).toBe(null);
+      });
+    });
+    describe('property node', () => {
+      test('should be key for cell in property key', () => {
+        // "key"  "value"
+        const key = new StringASTNodeImpl('key', createStartLinePos(5));
+        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const property = new PropertyASTNodeImpl(
+          key,
+          value,
+          createStartLinePos(14)
+        );
+        expect(findAtCell(property, 1, 1)).toBe(key);
+        expect(findAtCell(property, 1, 3)).toBe(key);
+        expect(findAtCell(property, 1, 5)).toBe(key);
+      });
+      test('should be value for cell in property value', () => {
+        // "key"  "value"
+        const key = new StringASTNodeImpl('key', createStartLinePos(5));
+        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const property = new PropertyASTNodeImpl(
+          key,
+          value,
+          createStartLinePos(14)
+        );
+        expect(findAtCell(property, 1, 8)).toBe(value);
+        expect(findAtCell(property, 1, 10)).toBe(value);
+        expect(findAtCell(property, 1, 14)).toBe(value);
+      });
+      test('should be property for cell in between key and value', () => {
+        const key = new StringASTNodeImpl('key', createStartLinePos(5));
+        const value = new StringASTNodeImpl('value', createLinePos(7, 7));
+        // "key"  "value"
+        const property = new PropertyASTNodeImpl(
+          key,
+          value,
+          createStartLinePos(14)
+        );
+        expect(findAtCell(property, 1, 7)).toBe(property);
+      });
+    });
+    describe('object node', () => {
+      test('should be object for cell in empty object', () => {
+        // {}
+        const obj = new ObjectASTNodeImpl([], createStartLinePos(2));
+
+        expect(findAtCell(obj, 1, 1)).toBe(obj);
+        expect(findAtCell(obj, 1, 2)).toBe(obj);
+        expect(findAtCell(obj, 1, 3)).toBe(obj);
+      });
+      test('should be property key for cell in property key for single line object', () => {
+        const key = new StringASTNodeImpl('key', createLinePos(2, 5));
+        const value = new StringASTNodeImpl('value', createLinePos(9, 7));
+        // __"key"  "value"
+        const property = new PropertyASTNodeImpl(
+          key,
+          value,
+          createStartLinePos(14)
+        );
+        // { "key"  "value" }
+        const obj = new ObjectASTNodeImpl([property], createStartLinePos(18));
+
+        expect(findAtCell(obj, 1, 3)).toBe(key);
+        expect(findAtCell(obj, 1, 5)).toBe(key);
+        expect(findAtCell(obj, 1, 8)).toBe(key);
+      });
+      test('should be object for cell in between property keys', () => {
+        // __"key"  "value"
+        const property1 = new PropertyASTNodeImpl(
+          new StringASTNodeImpl('key1', createLinePos(4, 5, 2, 3)),
+          new StringASTNodeImpl('value1', createLinePos(11, 8, 2, 10)),
+          createLinePos(4, 15, 2, 3)
+        );
+        const property2 = new PropertyASTNodeImpl(
+          new StringASTNodeImpl('key1', createLinePos(20, 5, 4, 3)),
+          new StringASTNodeImpl('value1', createLinePos(30, 8, 4, 10)),
+          createLinePos(23, 15, 4, 3)
+        );
+        // {
+        //   "key1" "value1"
+        //
+        //   "key2" "value2"
+        // }
+        const obj = new ObjectASTNodeImpl(
+          [property1, property2],
+          createStartPos(40, 5, 2)
+        );
+
+        expect(findAtCell(obj, 3, 1)).toBe(obj);
       });
     });
   });
