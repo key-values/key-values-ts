@@ -30,12 +30,12 @@ import KeyValues from 'key-values-ts';
 
 const input = `"key"
 {
-  "key 1" "value 1"
-  "key 2" "value 2"
+  "key 1"  "value 1"
+  "key 2"  "value 2"
 }`;
 
 // Convert the KeyValues text to an object:
-const obj = KeyValues.parse(text);
+const obj = KeyValues.parse(input);
 // {
 //   key: {
 //     'key 1': 'value 1',
@@ -43,10 +43,11 @@ const obj = KeyValues.parse(text);
 //   }
 // }
 
-const output = KeyValues.stringify(text);
+// Convert the object back to a KeyValues text
+const output = KeyValues.stringify(obj);
 // "key"
 // {
-//   "key 1" "value 1"
-//   "key 2" "value 2"
+//   "key 1"  "value 1"
+//   "key 2"  "value 2"
 // }
 ```
