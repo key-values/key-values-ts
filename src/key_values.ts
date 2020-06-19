@@ -3,7 +3,7 @@ import NodeParser from './node_parser';
 import { parseWith, KEY_VALUES } from './parser';
 import NodeStringifier from './node_stringifier';
 import ObjectParser from './object_parser';
-import { ASTNode } from './ast_node';
+import { ASTNode, findAtOffset, findAtCell } from './ast_node';
 import { PropertyASTNodeImpl, ValueASTNodeImpl } from './ast_node_impl';
 
 export class KeyValuesDocument {
@@ -54,6 +54,33 @@ export class KeyValuesDocument {
       return '';
     } else {
       return NodeStringifier.stringifyNode(this.root);
+    }
+  }
+
+  /**
+   * Finds the deepest ASTNode at the given offset.
+   * @param offset The offset to find the node at.
+   * @returns The ASTNode at the given offset or null if none could be found.
+   */
+  public findAtOffset(offset: number): ASTNode | null {
+    if (!this.root) {
+      return null;
+    } else {
+      return findAtOffset(this.root, offset);
+    }
+  }
+
+  /**
+   * Finds the deepest ASTNode at the given row and column.
+   * @param row The row of the cell to find the node at.
+   * @param column The column of the cell to find the node at.
+   * @returns The ASTNode at the given cell or null if none could be found.
+   */
+  public findAtCell(row: number, column: number): ASTNode | null {
+    if (!this.root) {
+      return null;
+    } else {
+      return findAtCell(this.root, row, column);
     }
   }
 }
