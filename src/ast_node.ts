@@ -109,3 +109,34 @@ export function findAtOffset(node: ASTNode, offset: number): ASTNode | null {
     return null;
   }
 }
+
+/** Finds the deepest AST node at the given row and column. */
+export function findAtCell(
+  node: ASTNode,
+  row: number,
+  column: number
+): ASTNode | null {
+  // Check if cell is contained in the node
+  if (
+    node.pos &&
+    (node.pos.rowBegin < row ||
+      (node.pos.rowBegin === row && node.pos.columnBegin <= column)) &&
+    (node.pos.rowEnd > row ||
+      (node.pos.rowEnd === row && node.pos.columnEnd >= column))
+  ) {
+    let result = node;
+    if (node.children) {
+      // Check if the cell is contained in a child
+      node.children.forEach((child) => {
+        const childResult = findAtCell(child, row, column);
+        if (childResult) {
+          result = childResult;
+          return;
+        }
+      });
+    }
+    return result;
+  } else {
+    return null;
+  }
+}
