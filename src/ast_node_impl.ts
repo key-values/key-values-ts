@@ -86,6 +86,10 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
     this.valueNode = valueNode;
     valueNode.parent = this;
   }
+
+  public get children(): ASTNode[] {
+    return [this.keyNode, this.valueNode];
+  }
 }
 
 export class ObjectASTNodeImpl extends ASTNodeImpl implements ObjectASTNode {
