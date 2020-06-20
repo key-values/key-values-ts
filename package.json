@@ -1,6 +1,6 @@
 {
   "name": "key-values-ts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A TypeScript parser for the KeyValues data format (also called Valve Data Format).",
   "keywords": [
     "KeyValues",
