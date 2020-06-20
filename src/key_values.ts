@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import NodeParser from './node_parser';
+import * as NodeParser from './node_parser';
 import { parseWith, KEY_VALUES } from './parser';
-import NodeStringifier from './node_stringifier';
-import ObjectParser from './object_parser';
+import * as NodeStringifier from './node_stringifier';
+import * as ObjectParser from './object_parser';
 import { ASTNode, findAtOffset, findAtCell } from './ast_node';
 import { PropertyASTNodeImpl, ValueASTNodeImpl } from './ast_node_impl';
 

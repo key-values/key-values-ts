@@ -6,7 +6,7 @@ import {
 } from './ast_node';
 
 /** Generates the specified amount of indention. */
-function genIndent(indent?: number): string {
+export function genIndent(indent?: number): string {
   if (!indent) return '';
 
   let indentStr = '';
@@ -20,13 +20,19 @@ function genIndent(indent?: number): string {
 }
 
 /** Converts a StringASTNode to a KeyValues string. */
-function stringifyStringNode(node: StringASTNode, indent?: number): string {
+export function stringifyStringNode(
+  node: StringASTNode,
+  indent?: number
+): string {
   const indentStr = genIndent(indent);
   return `${indentStr}"${node.value}"`;
 }
 
 /** Converts a PropertyASTNode to a KeyValues string. */
-function stringifyPropertyNode(node: PropertyASTNode, indent?: number): string {
+export function stringifyPropertyNode(
+  node: PropertyASTNode,
+  indent?: number
+): string {
   const key = stringifyNode(node.keyNode, indent);
 
   if (node.valueNode.type == 'object') {
@@ -41,7 +47,10 @@ function stringifyPropertyNode(node: PropertyASTNode, indent?: number): string {
 }
 
 /** Converts an ObjectASTNode to a KeyValues string. */
-function stringifyObjectNode(node: ObjectASTNode, indent?: number): string {
+export function stringifyObjectNode(
+  node: ObjectASTNode,
+  indent?: number
+): string {
   const indentStr = genIndent(indent);
 
   switch (node.properties.length) {
@@ -65,7 +74,7 @@ function stringifyObjectNode(node: ObjectASTNode, indent?: number): string {
 }
 
 /** Converts an ASTNode to a KeyValues string. */
-function stringifyNode(node: ASTNode, indent?: number): string {
+export function stringifyNode(node: ASTNode, indent?: number): string {
   switch (node.type) {
     case 'string':
       return stringifyStringNode(node as StringASTNode, indent);
@@ -77,13 +86,3 @@ function stringifyNode(node: ASTNode, indent?: number): string {
       throw new Error(`Unexpected node type: ${node.type}.`);
   }
 }
-
-const NodeStringifier = {
-  genIndent,
-  stringifyStringNode,
-  stringifyPropertyNode,
-  stringifyObjectNode,
-  stringifyNode,
-};
-
-export default NodeStringifier;
