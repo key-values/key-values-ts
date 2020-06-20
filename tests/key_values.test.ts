@@ -1,4 +1,4 @@
-import KeyValues, { KeyValuesDocument } from '../src/key_values';
+import { stringify, parse, KeyValuesDocument } from '../src/key_values';
 import { PropertyASTNodeImpl, StringASTNodeImpl } from '../src/ast_node_impl';
 
 describe('KeyValues', () => {
@@ -30,7 +30,7 @@ describe('KeyValues', () => {
         },
       };
 
-      expect(KeyValues.parse(text)).toEqual(expected);
+      expect(parse(text)).toEqual(expected);
     });
     test('should parse nested text', () => {
       const text = `"key" { 
@@ -53,7 +53,7 @@ describe('KeyValues', () => {
         },
       };
 
-      expect(KeyValues.parse(text)).toEqual(expected);
+      expect(parse(text)).toEqual(expected);
     });
   });
   // Stringify
@@ -62,7 +62,7 @@ describe('KeyValues', () => {
       const obj = { key: 'value' };
       const expected = `"key"\t"value"`;
 
-      expect(KeyValues.stringify(obj)).toEqual(expected);
+      expect(stringify(obj)).toEqual(expected);
     });
     test('should extract nested single-property object', () => {
       const obj = {
@@ -78,7 +78,7 @@ describe('KeyValues', () => {
       // }
       const expected = `"key"\n{\n\t"key 1"\t"value 1"\n\t"key 2"\t"value 2"\n}`;
 
-      expect(KeyValues.stringify(obj)).toEqual(expected);
+      expect(stringify(obj)).toEqual(expected);
     });
   });
 });
