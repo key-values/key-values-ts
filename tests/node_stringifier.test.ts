@@ -3,7 +3,7 @@ import {
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
 } from '../src/ast_node_impl';
-import NodeStringifier from '../src/node_stringifier';
+import * as NodeStringifier from '../src/node_stringifier';
 
 describe('NodeStringifier', () => {
   // String node

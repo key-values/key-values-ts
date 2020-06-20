@@ -8,12 +8,14 @@ import {
 export type KeyValuesObject = string | Record<string, unknown>;
 
 /** Converts a StringASTNode to a string. */
-function parseStringNode(node: StringASTNode): string {
+export function parseStringNode(node: StringASTNode): string {
   return node.value;
 }
 
 /** Converts a PropertyASTNode to an object. */
-function parsePropertyNode(node: PropertyASTNode): Record<string, unknown> {
+export function parsePropertyNode(
+  node: PropertyASTNode
+): Record<string, unknown> {
   // Determine key and value
   const key = node.keyNode.value;
   const value = parseNode(node.valueNode);
@@ -26,7 +28,7 @@ function parsePropertyNode(node: PropertyASTNode): Record<string, unknown> {
 }
 
 /** Converts an ObjectASTNode to an object. */
-function parseObjectNode(node: ObjectASTNode): Record<string, unknown> {
+export function parseObjectNode(node: ObjectASTNode): Record<string, unknown> {
   // Create object
   const obj: Record<string, unknown> = {};
 
@@ -43,7 +45,7 @@ function parseObjectNode(node: ObjectASTNode): Record<string, unknown> {
 }
 
 /** Converts an ASTNode to an object. */
-function parseNode(node: ASTNode): KeyValuesObject {
+export function parseNode(node: ASTNode): KeyValuesObject {
   switch (node.type) {
     case 'string':
       return parseStringNode(node as StringASTNode);
@@ -55,12 +57,3 @@ function parseNode(node: ASTNode): KeyValuesObject {
       throw new Error(`Unexpected node type: ${node.type}.`);
   }
 }
-
-const NodeParser = {
-  parseStringNode,
-  parsePropertyNode,
-  parseObjectNode,
-  parseNode,
-};
-
-export default NodeParser;

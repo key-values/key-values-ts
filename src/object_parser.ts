@@ -7,31 +7,31 @@ import {
 } from './ast_node_impl';
 
 /** Converts a string to a StringASTNode. */
-function parseString(value: string): StringASTNodeImpl {
+export function parseString(value: string): StringASTNodeImpl {
   return new StringASTNodeImpl(value);
 }
 
 /** Converts a number to a StringASTNode. */
-function parseNumber(value: number): StringASTNodeImpl {
+export function parseNumber(value: number): StringASTNodeImpl {
   const str = value.toString();
   return new StringASTNodeImpl(str);
 }
 
 /** Converts a boolean to a StringASTNode. */
-function parseBoolean(value: boolean): StringASTNodeImpl {
+export function parseBoolean(value: boolean): StringASTNodeImpl {
   const str = value ? '1' : '0';
   return new StringASTNodeImpl(str);
 }
 
 /** Converts a missing value to a StringASTNode. */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function parseMissing(value: undefined | null): StringASTNodeImpl {
+export function parseMissing(value: undefined | null): StringASTNodeImpl {
   const str = '';
   return new StringASTNodeImpl(str);
 }
 
 /** Converts an array to an ObjectASTNode. */
-function parseArray(value: unknown[]): ObjectASTNodeImpl {
+export function parseArray(value: unknown[]): ObjectASTNodeImpl {
   const properties = value.map(
     (value, index) =>
       new PropertyASTNodeImpl(
@@ -43,7 +43,7 @@ function parseArray(value: unknown[]): ObjectASTNodeImpl {
 }
 
 /** Converts an object to an ObjectASTNode. */
-function parseObject(value: Record<string, unknown>): ObjectASTNodeImpl {
+export function parseObject(value: Record<string, unknown>): ObjectASTNodeImpl {
   const properties = Object.keys(value).map(
     (key) =>
       new PropertyASTNodeImpl(
@@ -56,7 +56,7 @@ function parseObject(value: Record<string, unknown>): ObjectASTNodeImpl {
 }
 
 /** Converts any object to an ASTNode. */
-function parse(value: unknown): ASTNodeImpl {
+export function parse(value: unknown): ASTNodeImpl {
   if (value === undefined || value === null) {
     return parseMissing(value);
   } else if (typeof value === 'string') {
@@ -71,15 +71,3 @@ function parse(value: unknown): ASTNodeImpl {
     return parseObject(value as Record<string, unknown>);
   }
 }
-
-const ObjectParser = {
-  parseNumber,
-  parseBoolean,
-  parseMissing,
-  parseString,
-  parseArray,
-  parseObject,
-  parse,
-};
-
-export default ObjectParser;
