@@ -28,7 +28,8 @@
     "coverage": "jest --coverage",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "eslint \"src/**/*.ts\" --fix",
-    "prepublish": "yarn lint && yarn build && yarn test"
+    "prepublish": "yarn lint && yarn build && yarn test",
+    "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
