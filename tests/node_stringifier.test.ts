@@ -6,6 +6,55 @@ import {
 import * as NodeStringifier from '../src/node_stringifier';
 
 describe('NodeStringifier', () => {
+  // Generate indent
+  describe('genIndent', () => {
+    test('should generate undefined indent with tabs', () => {
+      const indent = NodeStringifier.genIndent(undefined);
+      const expected = '';
+
+      expect(indent).toEqual(expected);
+    });
+    test('should generate 0 indent with tabs', () => {
+      const options: NodeStringifier.StringifyOptions = {
+        tabSize: 4,
+        insertSpaces: false,
+      };
+      const indent = NodeStringifier.genIndent(0, options);
+      const expected = '';
+
+      expect(indent).toEqual(expected);
+    });
+    test('should generate 2 indent with tabs', () => {
+      const options: NodeStringifier.StringifyOptions = {
+        tabSize: 4,
+        insertSpaces: false,
+      };
+      const indent = NodeStringifier.genIndent(2, options);
+      const expected = '\t\t';
+
+      expect(indent).toEqual(expected);
+    });
+    test('should generate 2 indent with 4 spaces', () => {
+      const options: NodeStringifier.StringifyOptions = {
+        tabSize: 4,
+        insertSpaces: true,
+      };
+      const indent = NodeStringifier.genIndent(2, options);
+      const expected = '        ';
+
+      expect(indent).toEqual(expected);
+    });
+    test('should generate 2 indent with 2 spaces', () => {
+      const options: NodeStringifier.StringifyOptions = {
+        tabSize: 2,
+        insertSpaces: true,
+      };
+      const indent = NodeStringifier.genIndent(2, options);
+      const expected = '    ';
+
+      expect(indent).toEqual(expected);
+    });
+  });
   // String node
   describe('stringifyStringNode', () => {
     test('should stringify simple string', () => {
@@ -17,11 +66,32 @@ describe('NodeStringifier', () => {
   });
   // Property node
   describe('stringifyPropertyNode', () => {
-    test('should stringify simple string property', () => {
+    test('should stringify simple string property with tab indention', () => {
       const node = createStringPropertyNode('key', 'value');
       const expected = '"key"\t"value"';
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify simple string property with 2 space indention', () => {
+      const node = createStringPropertyNode('key', 'value');
+      const expected = '"key"  "value"';
+      const options: NodeStringifier.StringifyOptions = {
+        tabSize: 2,
+        insertSpaces: true,
+      };
+      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+
+      expect(result).toEqual(expected);
+    });
+    test('should stringify simple string property with 4 space indention', () => {
+      const node = createStringPropertyNode('key', 'value');
+      const expected = '"key"    "value"';
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: true,
+      };
+      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+
+      expect(result).toEqual(expected);
     });
     test('should stringify empty object property inline', () => {
       const node = new PropertyASTNodeImpl(
@@ -32,7 +102,7 @@ describe('NodeStringifier', () => {
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
     });
-    test('should stringify single string-object property in multiple lines', () => {
+    test('should stringify single string-object property in multiple lines with tab indention', () => {
       const node = new PropertyASTNodeImpl(
         new StringASTNodeImpl('key1'),
         new ObjectASTNodeImpl([createStringPropertyNode('key1.1', 'value1.1')])
@@ -42,6 +112,21 @@ describe('NodeStringifier', () => {
       const expected = '"key1"\n{ "key1.1"\t"value1.1" }';
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify single string-object property in multiple lines with 4 space indention', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key1'),
+        new ObjectASTNodeImpl([createStringPropertyNode('key1.1', 'value1.1')])
+      );
+      // "key"
+      // { "key1.1"    "value1.1" }
+      const expected = '"key1"\n{ "key1.1"    "value1.1" }';
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: true,
+      };
+      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+
+      expect(result).toEqual(expected);
     });
     test('should stringify property with object-value with one multi-line object property', () => {
       const node = new PropertyASTNodeImpl(
@@ -97,7 +182,7 @@ describe('NodeStringifier', () => {
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
-    test('should stringify multi-line object', () => {
+    test('should stringify multi-line object with tab indention', () => {
       const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         createStringPropertyNode('key2', 'value2'),
@@ -111,6 +196,46 @@ describe('NodeStringifier', () => {
       const expected = `{\n\t"key1"\t"value1"\n\t"key2"\t"value2"\n\t"key3"\t"value3"\n}`;
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
+    });
+    test('should stringify multi-line object with 2 space indention', () => {
+      const node = new ObjectASTNodeImpl([
+        createStringPropertyNode('key1', 'value1'),
+        createStringPropertyNode('key2', 'value2'),
+        createStringPropertyNode('key3', 'value3'),
+      ]);
+      // {
+      //   "key1"  "value1"
+      //   "key2"  "value2"
+      //   "key3"  "value3"
+      // }
+      const expected = `{\n  "key1"  "value1"\n  "key2"  "value2"\n  "key3"  "value3"\n}`;
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: true,
+        tabSize: 2,
+      };
+      const result = NodeStringifier.stringifyObjectNode(node, 0, options);
+
+      expect(result).toEqual(expected);
+    });
+    test('should stringify multi-line object with 4 space indention', () => {
+      const node = new ObjectASTNodeImpl([
+        createStringPropertyNode('key1', 'value1'),
+        createStringPropertyNode('key2', 'value2'),
+        createStringPropertyNode('key3', 'value3'),
+      ]);
+      // {
+      //     "key1"    "value1"
+      //     "key2"    "value2"
+      //     "key3"    "value3"
+      // }
+      const expected = `{\n    "key1"    "value1"\n    "key2"    "value2"\n    "key3"    "value3"\n}`;
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: true,
+        tabSize: 4,
+      };
+      const result = NodeStringifier.stringifyObjectNode(node, 0, options);
+
+      expect(result).toEqual(expected);
     });
     test('should stringify nested multi-line object', () => {
       const node = new ObjectASTNodeImpl([

@@ -75,14 +75,14 @@ export function stringifyPropertyNode(
   indent?: number,
   options?: StringifyOptions
 ): string {
-  const key = stringifyNode(node.keyNode, indent);
+  const key = stringifyStringNode(node.keyNode, indent, options);
 
   if (node.valueNode.type == 'object' && node.valueNode.properties.length > 0) {
     // Object values are placed in a new line
-    const value = stringifyNode(node.valueNode, indent, options);
+    const value = stringifyObjectNode(node.valueNode, indent, options);
     return `${key}\n${value}`;
   } else {
-    // String values are placed in the same line, seperated by tabs
+    // String values and empty objects are placed in the same line
     const value = stringifyNode(node.valueNode, 1, options);
     return `${key}${value}`;
   }
@@ -104,12 +104,14 @@ export function stringifyObjectNode(
     node.properties[0].valueNode.type === 'string'
   ) {
     // Single-line object
-    const property = stringifyNode(node.properties[0]);
+    const property = stringifyPropertyNode(node.properties[0], 0, options);
     return `${indentStr}{ ${property} }`;
   } else {
     // Multi-line object
     const properties = node.properties
-      .map((property) => stringifyNode(property, (indent ?? 0) + 1), options)
+      .map((property) =>
+        stringifyPropertyNode(property, (indent ?? 0) + 1, options)
+      )
       .join('\n');
 
     return `${indentStr}{\n${properties}\n${indentStr}}`;
