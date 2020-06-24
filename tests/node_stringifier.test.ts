@@ -237,6 +237,48 @@ describe('NodeStringifier', () => {
 
       expect(result).toEqual(expected);
     });
+    test('should stringify multi-line object with 4 tab indention and alignment', () => {
+      const node = new ObjectASTNodeImpl([
+        createStringPropertyNode('test', 'value1'),
+        createStringPropertyNode('test test test', 'value2'),
+        createStringPropertyNode('test a', 'value3'),
+      ]);
+      // {
+      //     "test"              "value1"
+      //     "test test test"    "value2"
+      //     "test a"            "value3"
+      // }
+      const expected = `{\n\t"test"\t\t\t\t"value1"\n\t"test test test"\t"value2"\n\t"test a"\t\t\t"value3"\n}`;
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: false,
+        tabSize: 4,
+        alignValues: true,
+      };
+      const result = NodeStringifier.stringifyObjectNode(node, options);
+
+      expect(result).toEqual(expected);
+    });
+    test('should stringify multi-line object with 4 space indention and alignment', () => {
+      const node = new ObjectASTNodeImpl([
+        createStringPropertyNode('test', 'value1'),
+        createStringPropertyNode('test test test', 'value2'),
+        createStringPropertyNode('test a', 'value3'),
+      ]);
+      // {
+      //     "test"              "value1"
+      //     "test test test"    "value2"
+      //     "test a"            "value3"
+      // }
+      const expected = `{\n    "test"              "value1"\n    "test test test"    "value2"\n    "test a"            "value3"\n}`;
+      const options: NodeStringifier.StringifyOptions = {
+        insertSpaces: true,
+        tabSize: 4,
+        alignValues: true,
+      };
+      const result = NodeStringifier.stringifyObjectNode(node, options);
+
+      expect(result).toEqual(expected);
+    });
     test('should stringify nested multi-line object', () => {
       const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
