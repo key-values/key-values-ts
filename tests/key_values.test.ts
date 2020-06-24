@@ -1,5 +1,6 @@
 import { stringify, parse, KeyValuesDocument } from '../src/key_values';
 import { PropertyASTNodeImpl, StringASTNodeImpl } from '../src/ast_node_impl';
+import { StringifyOptions } from '../src/node_stringifier';
 
 describe('KeyValues', () => {
   // KeyValues document
@@ -79,6 +80,30 @@ describe('KeyValues', () => {
       const expected = `"key"\n{\n\t"key 1"\t"value 1"\n\t"key 2"\t"value 2"\n}`;
 
       expect(stringify(obj)).toEqual(expected);
+    });
+    test('should wrap string in property with specified key', () => {
+      const value = 'value';
+      // "key"  "value"
+      const expected = `"key"\t"value"`;
+
+      expect(stringify(value, undefined, 'key')).toEqual(expected);
+    });
+    test('should apply space indention option', () => {
+      const obj = {
+        key: {
+          'key 1': 'value 1',
+          'key 2': 'value 2',
+        },
+      };
+      // "key"
+      // {
+      //   "key 1"  "value 1"
+      //   "key 2"  "value 2"
+      // }
+      const expected = `"key"\n{\n    "key 1"    "value 1"\n    "key 2"    "value 2"\n}`;
+      const options: StringifyOptions = { insertSpaces: true };
+
+      expect(stringify(obj, options)).toEqual(expected);
     });
   });
 });
