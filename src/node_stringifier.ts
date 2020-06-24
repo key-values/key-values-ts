@@ -10,17 +10,21 @@ export interface StringifyOptions {
   tabSize?: number;
   /** True if spaces should be inserted instead of tabs, else false. Defaults to false. */
   insertSpaces?: boolean;
+  /** True if the values of an object's properties should be aligned, else false. Defaults to false. */
+  alignValues?: boolean;
 }
 
 interface StringifySettings extends StringifyOptions {
   tabSize: number;
   insertSpaces: boolean;
+  alignValues: boolean;
 }
 
 /** The default stringify settings. */
 const DEFAULT_SETTINGS: StringifySettings = {
   tabSize: 4,
   insertSpaces: false,
+  alignValues: false,
 };
 
 /** Converts the given options to settings. */
@@ -30,7 +34,18 @@ function getSettings(options?: StringifyOptions): StringifySettings {
   return {
     tabSize: options.tabSize ?? DEFAULT_SETTINGS.tabSize,
     insertSpaces: options.insertSpaces ?? DEFAULT_SETTINGS.insertSpaces,
+    alignValues: options.alignValues ?? DEFAULT_SETTINGS.alignValues,
   };
+}
+
+function genStr(str: string, count: number): string {
+  let result = '';
+
+  for (let i = 0; i < count; i++) {
+    result += str;
+  }
+
+  return result;
 }
 
 /** Generates the specified amount of indention. */
@@ -39,24 +54,9 @@ export function genIndent(options?: StringifyOptions, indent?: number): string {
 
   const settings = getSettings(options);
 
-  let indentStr = '';
-
-  // Determine the string to indent by
-  let str = '';
-  if (settings.insertSpaces) {
-    for (let i = 0; i < settings.tabSize; i++) {
-      str += ' ';
-    }
-  } else {
-    str = '\t';
-  }
-
-  for (let i = 0; i < indent; i++) {
-    // Add indention
-    indentStr += str;
-  }
-
-  return indentStr;
+  return settings.insertSpaces
+    ? genStr(genStr(' ', settings.tabSize), indent)
+    : genStr('\t', indent);
 }
 
 /** Converts a StringASTNode to a KeyValues string. */
@@ -73,7 +73,8 @@ export function stringifyStringNode(
 export function stringifyPropertyNode(
   node: PropertyASTNode,
   options?: StringifyOptions,
-  indent?: number
+  indent?: number,
+  maxKeyLength?: number
 ): string {
   const key = stringifyStringNode(node.keyNode, options, indent);
 
@@ -83,8 +84,30 @@ export function stringifyPropertyNode(
     return `${key}\n${value}`;
   } else {
     // String values and empty objects are placed in the same line
-    const value = stringifyNode(node.valueNode, options, 1);
-    return `${key}${value}`;
+    let indentStr = genIndent(options, 1);
+    const settings = getSettings(options);
+
+    if (settings.alignValues && maxKeyLength) {
+      // Align the values
+      const tabSize = settings.tabSize;
+
+      const keyLength =
+        node.keyNode.value.length + (node.keyNode.isQuoted ? 2 : 0);
+
+      const target = Math.floor(maxKeyLength / tabSize) * tabSize + tabSize;
+
+      if (settings.insertSpaces) {
+        indentStr = genStr(' ', target - keyLength);
+      } else {
+        indentStr = genStr(
+          '\t',
+          target / tabSize - Math.floor(keyLength / tabSize)
+        );
+      }
+    }
+
+    const value = stringifyNode(node.valueNode);
+    return `${key}${indentStr}${value}`;
   }
 }
 
@@ -108,10 +131,26 @@ export function stringifyObjectNode(
     return `${indentStr}{ ${property} }`;
   } else {
     // Multi-line object
+    let maxKeyLength = 0;
+    if (getSettings(options).alignValues) {
+      // Determine maximum key length
+      node.properties.forEach((property) => {
+        const keyLength =
+          property.keyNode.value.length + (property.keyNode.isQuoted ? 2 : 0);
+        if (keyLength > maxKeyLength) {
+          maxKeyLength = keyLength;
+        }
+      });
+    }
     const properties = node.properties
-      .map((property) =>
-        stringifyPropertyNode(property, options, (indent ?? 0) + 1)
-      )
+      .map((property) => {
+        return stringifyPropertyNode(
+          property,
+          options,
+          (indent ?? 0) + 1,
+          maxKeyLength
+        );
+      })
       .join('\n');
 
     return `${indentStr}{\n${properties}\n${indentStr}}`;
