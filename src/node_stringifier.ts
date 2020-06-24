@@ -5,31 +5,46 @@ import {
   ASTNode,
 } from './ast_node';
 
-export type StringifyOptions = {
-  /** The number of spaces a tab is equal to. */
-  tabSize: number;
-  /** True if spaces should be inserted instead of tabs, else false. */
-  insertSpaces: boolean;
-};
+export interface StringifyOptions {
+  /** The number of spaces a tab is equal to. Defaults to 4. */
+  tabSize?: number;
+  /** True if spaces should be inserted instead of tabs, else false. Defaults to false. */
+  insertSpaces?: boolean;
+}
 
-/** The default stringify options. */
-const DEFAULT_OPTIONS: StringifyOptions = {
+interface StringifySettings extends StringifyOptions {
+  tabSize: number;
+  insertSpaces: boolean;
+}
+
+/** The default stringify settings. */
+const DEFAULT_SETTINGS: StringifySettings = {
   tabSize: 4,
   insertSpaces: false,
 };
+
+/** Converts the given options to settings. */
+function getSettings(options?: StringifyOptions): StringifySettings {
+  if (!options) return DEFAULT_SETTINGS;
+
+  return {
+    tabSize: options.tabSize ?? DEFAULT_SETTINGS.tabSize,
+    insertSpaces: options.insertSpaces ?? DEFAULT_SETTINGS.insertSpaces,
+  };
+}
 
 /** Generates the specified amount of indention. */
 export function genIndent(indent?: number, options?: StringifyOptions): string {
   if (!indent) return '';
 
-  const _options = options ?? DEFAULT_OPTIONS;
+  const settings = getSettings(options);
 
   let indentStr = '';
 
   // Determine the string to indent by
   let str = '';
-  if (_options.insertSpaces) {
-    for (let i = 0; i < _options.tabSize; i++) {
+  if (settings.insertSpaces) {
+    for (let i = 0; i < settings.tabSize; i++) {
       str += ' ';
     }
   } else {
