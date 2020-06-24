@@ -34,7 +34,7 @@ function getSettings(options?: StringifyOptions): StringifySettings {
 }
 
 /** Generates the specified amount of indention. */
-export function genIndent(indent?: number, options?: StringifyOptions): string {
+export function genIndent(options?: StringifyOptions, indent?: number): string {
   if (!indent) return '';
 
   const settings = getSettings(options);
@@ -62,28 +62,28 @@ export function genIndent(indent?: number, options?: StringifyOptions): string {
 /** Converts a StringASTNode to a KeyValues string. */
 export function stringifyStringNode(
   node: StringASTNode,
-  indent?: number,
-  options?: StringifyOptions
+  options?: StringifyOptions,
+  indent?: number
 ): string {
-  const indentStr = genIndent(indent, options);
+  const indentStr = genIndent(options, indent);
   return `${indentStr}"${node.value}"`;
 }
 
 /** Converts a PropertyASTNode to a KeyValues string. */
 export function stringifyPropertyNode(
   node: PropertyASTNode,
-  indent?: number,
-  options?: StringifyOptions
+  options?: StringifyOptions,
+  indent?: number
 ): string {
-  const key = stringifyStringNode(node.keyNode, indent, options);
+  const key = stringifyStringNode(node.keyNode, options, indent);
 
   if (node.valueNode.type == 'object' && node.valueNode.properties.length > 0) {
     // Object values are placed in a new line
-    const value = stringifyObjectNode(node.valueNode, indent, options);
+    const value = stringifyObjectNode(node.valueNode, options, indent);
     return `${key}\n${value}`;
   } else {
     // String values and empty objects are placed in the same line
-    const value = stringifyNode(node.valueNode, 1, options);
+    const value = stringifyNode(node.valueNode, options, 1);
     return `${key}${value}`;
   }
 }
@@ -91,10 +91,10 @@ export function stringifyPropertyNode(
 /** Converts an ObjectASTNode to a KeyValues string. */
 export function stringifyObjectNode(
   node: ObjectASTNode,
-  indent?: number,
-  options?: StringifyOptions
+  options?: StringifyOptions,
+  indent?: number
 ): string {
-  const indentStr = genIndent(indent, options);
+  const indentStr = genIndent(options, indent);
 
   if (node.properties.length === 0) {
     // Empty object
@@ -104,13 +104,13 @@ export function stringifyObjectNode(
     node.properties[0].valueNode.type === 'string'
   ) {
     // Single-line object
-    const property = stringifyPropertyNode(node.properties[0], 0, options);
+    const property = stringifyPropertyNode(node.properties[0], options);
     return `${indentStr}{ ${property} }`;
   } else {
     // Multi-line object
     const properties = node.properties
       .map((property) =>
-        stringifyPropertyNode(property, (indent ?? 0) + 1, options)
+        stringifyPropertyNode(property, options, (indent ?? 0) + 1)
       )
       .join('\n');
 
@@ -121,16 +121,16 @@ export function stringifyObjectNode(
 /** Converts an ASTNode to a KeyValues string. */
 export function stringifyNode(
   node: ASTNode,
-  indent?: number,
-  options?: StringifyOptions
+  options?: StringifyOptions,
+  indent?: number
 ): string {
   switch (node.type) {
     case 'string':
-      return stringifyStringNode(node as StringASTNode, indent, options);
+      return stringifyStringNode(node as StringASTNode, options, indent);
     case 'property':
-      return stringifyPropertyNode(node as PropertyASTNode, indent, options);
+      return stringifyPropertyNode(node as PropertyASTNode, options, indent);
     case 'object':
-      return stringifyObjectNode(node as ObjectASTNode, indent, options);
+      return stringifyObjectNode(node as ObjectASTNode, options, indent);
     default:
       throw new Error(`Unexpected node type: ${node.type}.`);
   }

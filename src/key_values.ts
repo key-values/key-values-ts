@@ -49,11 +49,11 @@ export class KeyValuesDocument {
   }
 
   /** Converts the KeyValues document to a KeyValues string. */
-  public toString(): string {
+  public toString(options?: NodeStringifier.StringifyOptions): string {
     if (!this.root) {
       return '';
     } else {
-      return NodeStringifier.stringifyNode(this.root);
+      return NodeStringifier.stringifyNode(this.root, options);
     }
   }
 
@@ -91,14 +91,18 @@ export function parse(text: string): unknown {
 }
 
 /** Converts a JavaScript value into a KeyValues string. */
-export function stringify(value: unknown, key?: string): string {
+export function stringify(
+  value: unknown,
+  options?: NodeStringifier.StringifyOptions,
+  key?: string
+): string {
   if (key) {
     // Wrap the value inside an object
     const obj: Record<string, unknown> = {};
     obj[key] = value;
 
-    return KeyValuesDocument.fromObject(obj).toString();
+    return KeyValuesDocument.fromObject(obj).toString(options);
   } else {
-    return KeyValuesDocument.fromObject(value).toString();
+    return KeyValuesDocument.fromObject(value).toString(options);
   }
 }

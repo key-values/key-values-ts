@@ -9,7 +9,7 @@ describe('NodeStringifier', () => {
   // Generate indent
   describe('genIndent', () => {
     test('should generate undefined indent with tabs', () => {
-      const indent = NodeStringifier.genIndent(undefined);
+      const indent = NodeStringifier.genIndent(undefined, undefined);
       const expected = '';
 
       expect(indent).toEqual(expected);
@@ -19,7 +19,7 @@ describe('NodeStringifier', () => {
         tabSize: 4,
         insertSpaces: false,
       };
-      const indent = NodeStringifier.genIndent(0, options);
+      const indent = NodeStringifier.genIndent(options, 0);
       const expected = '';
 
       expect(indent).toEqual(expected);
@@ -29,7 +29,7 @@ describe('NodeStringifier', () => {
         tabSize: 4,
         insertSpaces: false,
       };
-      const indent = NodeStringifier.genIndent(2, options);
+      const indent = NodeStringifier.genIndent(options, 2);
       const expected = '\t\t';
 
       expect(indent).toEqual(expected);
@@ -39,7 +39,7 @@ describe('NodeStringifier', () => {
         tabSize: 4,
         insertSpaces: true,
       };
-      const indent = NodeStringifier.genIndent(2, options);
+      const indent = NodeStringifier.genIndent(options, 2);
       const expected = '        ';
 
       expect(indent).toEqual(expected);
@@ -49,7 +49,7 @@ describe('NodeStringifier', () => {
         tabSize: 2,
         insertSpaces: true,
       };
-      const indent = NodeStringifier.genIndent(2, options);
+      const indent = NodeStringifier.genIndent(options, 2);
       const expected = '    ';
 
       expect(indent).toEqual(expected);
@@ -79,7 +79,7 @@ describe('NodeStringifier', () => {
         tabSize: 2,
         insertSpaces: true,
       };
-      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+      const result = NodeStringifier.stringifyPropertyNode(node, options);
 
       expect(result).toEqual(expected);
     });
@@ -89,7 +89,7 @@ describe('NodeStringifier', () => {
       const options: NodeStringifier.StringifyOptions = {
         insertSpaces: true,
       };
-      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+      const result = NodeStringifier.stringifyPropertyNode(node, options);
 
       expect(result).toEqual(expected);
     });
@@ -124,7 +124,7 @@ describe('NodeStringifier', () => {
       const options: NodeStringifier.StringifyOptions = {
         insertSpaces: true,
       };
-      const result = NodeStringifier.stringifyPropertyNode(node, 0, options);
+      const result = NodeStringifier.stringifyPropertyNode(node, options);
 
       expect(result).toEqual(expected);
     });
@@ -213,7 +213,7 @@ describe('NodeStringifier', () => {
         insertSpaces: true,
         tabSize: 2,
       };
-      const result = NodeStringifier.stringifyObjectNode(node, 0, options);
+      const result = NodeStringifier.stringifyObjectNode(node, options);
 
       expect(result).toEqual(expected);
     });
@@ -233,7 +233,7 @@ describe('NodeStringifier', () => {
         insertSpaces: true,
         tabSize: 4,
       };
-      const result = NodeStringifier.stringifyObjectNode(node, 0, options);
+      const result = NodeStringifier.stringifyObjectNode(node, options);
 
       expect(result).toEqual(expected);
     });
