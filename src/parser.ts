@@ -65,12 +65,7 @@ export default class KeyValuesParser {
         value.pos.columnEnd
       );
 
-      // Extract string value
-      let str = value.text.slice(1, value.text.length - 1);
-      // Resolve escaped quotes
-      str = str.replace(/\\"/, '"');
-
-      return new StringASTNodeImpl(str, pos);
+      return new StringASTNodeImpl(value.text, pos);
     };
 
     const applyQuotedString: (
