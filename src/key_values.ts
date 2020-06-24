@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as NodeParser from './node_parser';
-import { parseWith, KEY_VALUES } from './parser';
+import KeyValuesParser, { parseWith } from './parser';
 import * as NodeStringifier from './node_stringifier';
 import * as ObjectParser from './object_parser';
 import { ASTNode, findAtOffset, findAtCell } from './ast_node';
@@ -11,7 +11,8 @@ export class KeyValuesDocument {
 
   /** Creates a KeyValues document from a text. */
   public static fromText(text: string): KeyValuesDocument {
-    const root = parseWith(text, KEY_VALUES);
+    const parser = new KeyValuesParser();
+    const root = parseWith(text, parser.keyValues);
 
     return new KeyValuesDocument(root);
   }
