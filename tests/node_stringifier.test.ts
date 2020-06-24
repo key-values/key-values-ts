@@ -23,6 +23,52 @@ describe('NodeStringifier', () => {
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
     });
+    test('should stringify empty object property inline', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key'),
+        new ObjectASTNodeImpl([])
+      );
+      const expected = '"key"\t{}';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify single string-object property in multiple lines', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key1'),
+        new ObjectASTNodeImpl([createStringPropertyNode('key1.1', 'value1.1')])
+      );
+      // "key"
+      // { "key1.1"  "value1.1" }
+      const expected = '"key1"\n{ "key1.1"\t"value1.1" }';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify property with object-value with one multi-line object property', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('AbilitySpecial'),
+        new ObjectASTNodeImpl([
+          new PropertyASTNodeImpl(
+            new StringASTNodeImpl('01'),
+            new ObjectASTNodeImpl([
+              createStringPropertyNode('var_type', 'FIELD_FLOAT'),
+              createStringPropertyNode('base_capture_time', '6.0'),
+            ])
+          ),
+        ])
+      );
+      // "AbilitySpecial"
+      // {
+      //   "01"
+      //   {
+      //     "var_type"  "FIELD_FLOAT"
+      //     "base_capture_time"  "6.0"
+      //   }
+      // }
+      const expected =
+        '"AbilitySpecial"\n{\n\t"01"\n\t{\n\t\t"var_type"\t"FIELD_FLOAT"\n\t\t"base_capture_time"\t"6.0"\n\t}\n}';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
   });
   // Object node
   describe('stringifyObjectNode', () => {
@@ -32,11 +78,22 @@ describe('NodeStringifier', () => {
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
-    test('should stringify single-line object', () => {
+    test('should stringify single string-property object', () => {
       const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key', 'value'),
       ]);
       const expected = '{ "key"\t"value" }';
+
+      expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
+    });
+    test('should stringify single object-property object', () => {
+      const node = new ObjectASTNodeImpl([
+        new PropertyASTNodeImpl(
+          new StringASTNodeImpl('key'),
+          new ObjectASTNodeImpl([])
+        ),
+      ]);
+      const expected = '{\n\t"key"\t{}\n}';
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });

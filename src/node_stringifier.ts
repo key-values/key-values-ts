@@ -62,7 +62,7 @@ export function stringifyPropertyNode(
 ): string {
   const key = stringifyNode(node.keyNode, indent);
 
-  if (node.valueNode.type == 'object') {
+  if (node.valueNode.type == 'object' && node.valueNode.properties.length > 0) {
     // Object values are placed in a new line
     const value = stringifyNode(node.valueNode, indent, options);
     return `${key}\n${value}`;
@@ -81,23 +81,23 @@ export function stringifyObjectNode(
 ): string {
   const indentStr = genIndent(indent, options);
 
-  switch (node.properties.length) {
-    case 0:
-      // Empty object
-      return `${indentStr}{}`;
-    case 1: {
-      // Single-line object
-      const property = stringifyNode(node.properties[0]);
-      return `${indentStr}{ ${property} }`;
-    }
-    default: {
-      // Multi-line object
-      const properties = node.properties
-        .map((property) => stringifyNode(property, (indent ?? 0) + 1), options)
-        .join('\n');
+  if (node.properties.length === 0) {
+    // Empty object
+    return `${indentStr}{}`;
+  } else if (
+    node.properties.length === 1 &&
+    node.properties[0].valueNode.type === 'string'
+  ) {
+    // Single-line object
+    const property = stringifyNode(node.properties[0]);
+    return `${indentStr}{ ${property} }`;
+  } else {
+    // Multi-line object
+    const properties = node.properties
+      .map((property) => stringifyNode(property, (indent ?? 0) + 1), options)
+      .join('\n');
 
-      return `${indentStr}{\n${properties}\n${indentStr}}`;
-    }
+    return `${indentStr}{\n${properties}\n${indentStr}}`;
   }
 }
 
