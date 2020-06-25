@@ -19,11 +19,11 @@ export type KeyValuesASTNode = PropertyASTNode;
 export type ASTNode = BaseASTNode;
 
 export interface BaseASTNode {
-  readonly type: 'object' | 'property' | 'string';
+  readonly type: 'object' | 'property' | 'string' | 'comment';
   readonly parent?: ASTNode;
   readonly pos?: NodePosition;
   readonly children?: ASTNode[];
-  readonly value?: string | number | null;
+  readonly value?: string | null;
 }
 
 export type KeyASTNode = StringASTNode;
@@ -45,6 +45,11 @@ export interface ObjectASTNode extends BaseASTNode {
 export interface StringASTNode extends BaseASTNode {
   readonly type: 'string';
   readonly isQuoted: boolean;
+  readonly value: string;
+}
+
+export interface CommentASTNode extends BaseASTNode {
+  readonly type: 'comment';
   readonly value: string;
 }
 

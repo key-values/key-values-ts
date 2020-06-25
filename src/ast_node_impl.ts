@@ -6,6 +6,7 @@ import {
   ValueASTNode,
   KeyASTNode,
   NodePosition,
+  CommentASTNode,
 } from './ast_node';
 
 export class NodePositionImpl implements NodePosition {
@@ -38,7 +39,7 @@ export type KeyASTNodeImpl = StringASTNodeImpl;
 export type ValueASTNodeImpl = StringASTNodeImpl | ObjectASTNodeImpl;
 
 export abstract class ASTNodeImpl {
-  public abstract readonly type: 'object' | 'property' | 'string';
+  public abstract readonly type: 'object' | 'property' | 'string' | 'comment';
 
   public pos?: NodePosition;
   public parent: ASTNode | undefined;
@@ -66,6 +67,18 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
     super(pos);
     this.value = strValue;
     this.isQuoted = true;
+  }
+}
+
+export class CommentASTNodeImpl extends ASTNodeImpl implements CommentASTNode {
+  public type: 'comment' = 'comment';
+  public value: string;
+  public isInline: boolean;
+
+  constructor(value: string, isInline?: boolean, pos?: NodePosition) {
+    super(pos);
+    this.value = value;
+    this.isInline = isInline ?? false;
   }
 }
 
