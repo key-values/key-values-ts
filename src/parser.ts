@@ -25,6 +25,7 @@ import {
   KeyASTNodeImpl,
   ValueASTNodeImpl,
   KeyValuesASTNodeImpl,
+  CommentASTNodeImpl,
 } from './ast_node_impl';
 
 import { TokenKind, lexer } from './lexer';
@@ -33,9 +34,9 @@ export default class KeyValuesParser {
   public lexer: Lexer<TokenKind>;
 
   // Non-recursive parsers
-  public space: Parser<TokenKind, unknown>;
-  public comment: Parser<TokenKind, unknown>;
-  public trivia: Parser<TokenKind, unknown>;
+  public space: Parser<TokenKind, null>;
+  public comment: Parser<TokenKind, CommentASTNodeImpl>;
+  public trivia: Parser<TokenKind, CommentASTNodeImpl | null>;
   public openBrace: Parser<TokenKind, Token<TokenKind.LBrace>>;
   public closeBrace: Parser<TokenKind, Token<TokenKind.RBrace>>;
   public unquotedString: Parser<TokenKind, StringASTNodeImpl>;
@@ -94,6 +95,33 @@ export default class KeyValuesParser {
       return value;
     };
 
+    const applyComment: (
+      value: Token<TokenKind.Comment>
+    ) => CommentASTNodeImpl = (value) => {
+      const commentRegex = /\/\/\s*(.*?)\s*$/;
+      const commentMatch = value.text.match(commentRegex)?.groups;
+      const comment = commentMatch ? commentMatch[1] : '';
+
+      const pos = new NodePositionImpl(
+        value.pos.index,
+        value.text.length,
+        value.pos.rowBegin,
+        value.pos.columnBegin,
+        value.pos.rowEnd,
+        value.pos.columnEnd
+      );
+
+      return new CommentASTNodeImpl(comment, undefined, pos);
+    };
+
+    const applySpace: (value: Token<TokenKind.Space>) => null = () => null;
+
+    const applyTrivia: (
+      value: CommentASTNodeImpl | null
+    ) => CommentASTNodeImpl | null = (value) => {
+      return value;
+    };
+
     const applyKey: (value: StringASTNodeImpl) => KeyASTNodeImpl = (value) => {
       return value;
     };
@@ -105,10 +133,15 @@ export default class KeyValuesParser {
     };
 
     const applyProperty: (
-      value: [KeyASTNodeImpl, ValueASTNodeImpl]
+      value: [
+        KeyASTNodeImpl,
+        Array<CommentASTNodeImpl | null>,
+        ValueASTNodeImpl
+      ]
     ) => PropertyASTNodeImpl = (values) => {
       const key = values[0];
-      const value = values[1];
+      const trivia = values[1];
+      const value = values[2];
 
       if (!key.pos || !value.pos) throw new Error('Missing position data.');
 
@@ -121,7 +154,10 @@ export default class KeyValuesParser {
         value.pos.columnEnd
       );
 
-      const property = new PropertyASTNodeImpl(key, value, pos);
+      const comments = trivia.filter(
+        (item) => item !== null
+      ) as CommentASTNodeImpl[];
+      const property = new PropertyASTNodeImpl(key, value, comments, pos);
 
       return property;
     };
@@ -157,9 +193,9 @@ export default class KeyValuesParser {
     };
 
     // Non-recursive parsers
-    this.space = tok(TokenKind.Space);
-    this.comment = tok(TokenKind.Comment);
-    this.trivia = alt(this.space, this.comment);
+    this.space = apply(tok(TokenKind.Space), applySpace);
+    this.comment = apply(tok(TokenKind.Comment), applyComment);
+    this.trivia = apply(alt(this.space, this.comment), applyTrivia);
     this.openBrace = tok(TokenKind.LBrace);
     this.closeBrace = tok(TokenKind.RBrace);
     this.unquotedString = apply(
@@ -181,7 +217,7 @@ export default class KeyValuesParser {
 
     value.setPattern(apply(alt(this.string, object), applyValue));
     property.setPattern(
-      apply(seq(kleft(this.key, this.trivia), value), applyProperty)
+      apply(seq(this.key, rep_sc(this.trivia), value), applyProperty)
     );
     object.setPattern(
       apply(

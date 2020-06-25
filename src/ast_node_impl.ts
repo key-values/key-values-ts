@@ -87,10 +87,12 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
   public type: 'property' = 'property';
   public keyNode: KeyASTNode;
   public valueNode: ValueASTNode;
+  public comments: CommentASTNode[];
 
   constructor(
     keyNode: KeyASTNodeImpl,
     valueNode: ValueASTNodeImpl,
+    comments?: CommentASTNodeImpl[],
     pos?: NodePosition
   ) {
     super(pos);
@@ -98,10 +100,11 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
     keyNode.parent = this;
     this.valueNode = valueNode;
     valueNode.parent = this;
+    this.comments = comments ?? [];
   }
 
   public get children(): ASTNode[] {
-    return [this.keyNode, this.valueNode];
+    return [this.keyNode, ...this.comments, this.valueNode];
   }
 }
 

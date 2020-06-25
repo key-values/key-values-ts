@@ -33,6 +33,7 @@ export interface PropertyASTNode extends BaseASTNode {
   readonly type: 'property';
   readonly keyNode: KeyASTNode;
   readonly valueNode: ValueASTNode;
+  readonly comments: CommentASTNode[];
   readonly children: ASTNode[];
 }
 
