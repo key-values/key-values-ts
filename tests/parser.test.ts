@@ -14,7 +14,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.unquotedString);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeFalsy;
+      expect(result.isQuoted).toBeFalsy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 5);
     });
@@ -26,7 +26,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.quotedString);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 7);
     });
@@ -35,7 +35,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.quotedString);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value 1 and 2');
       assertSingleLinePos(result, 15);
     });
@@ -44,7 +44,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.quotedString);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value"WithQuote');
       assertSingleLinePos(result, 18);
     });
@@ -56,7 +56,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.string);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeFalsy;
+      expect(result.isQuoted).toBeFalsy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 5);
     });
@@ -65,7 +65,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.string);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 7);
     });
@@ -74,9 +74,20 @@ describe('Parser', () => {
       const result = parseWith(text, parser.string);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value 1 and 2');
       assertSingleLinePos(result, 15);
+    });
+  });
+  // Comment
+  describe('comment', () => {
+    test('should parse simple comment', () => {
+      const text = `// Comment`;
+      const result = parseWith(text, parser.comment);
+
+      expect(result.type).toEqual('comment');
+      expect(result.value).toEqual('Comment');
+      assertSingleLinePos(result, 10);
     });
   });
   // Key
@@ -90,12 +101,12 @@ describe('Parser', () => {
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 5);
     });
-    test('should parse simple quotedstring', () => {
+    test('should parse simple quoted string', () => {
       const text = `"value"`;
       const result = parseWith(text, parser.key);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 7);
     });
@@ -104,7 +115,7 @@ describe('Parser', () => {
       const result = parseWith(text, parser.key);
 
       expect(result.type).toEqual('string');
-      expect(result.isQuoted).toBeTruthy;
+      expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value 1 and 2');
       assertSingleLinePos(result, 15);
     });
@@ -260,6 +271,8 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
+      expect(result.comments.length).toBe(1);
+      expect(result.comments[0].value).toEqual('Comment');
     });
     test('should allow comments between key and object value', () => {
       const text = `"key"// Comment\n{ "key1"\t"value1" }`;
@@ -268,6 +281,8 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.type).toEqual('object');
+      expect(result.comments.length).toBe(1);
+      expect(result.comments[0].value).toEqual('Comment');
     });
     test('should parse simple single string object property', () => {
       const text = `"key1" { "key1.1" "value1.1" }`;
