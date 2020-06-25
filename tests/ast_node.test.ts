@@ -88,6 +88,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtOffset(property, 0)).toBe(key);
@@ -105,6 +106,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtOffset(property, 7)).toBe(value);
@@ -118,6 +120,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtOffset(property, 6)).toBe(property);
@@ -139,6 +142,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         // { "key"  "value" }
@@ -153,11 +157,13 @@ describe('ASTNode', () => {
         const property1 = new PropertyASTNodeImpl(
           new StringASTNodeImpl('key1', true, createLinePos(4, 5, 2, 3)),
           new StringASTNodeImpl('value1', true, createLinePos(11, 8, 2, 10)),
+          [],
           createLinePos(4, 15, 2, 3)
         );
         const property2 = new PropertyASTNodeImpl(
           new StringASTNodeImpl('key1', true, createLinePos(20, 5, 4, 3)),
           new StringASTNodeImpl('value1', true, createLinePos(30, 8, 4, 10)),
+          [],
           createLinePos(23, 15, 4, 3)
         );
         // {
@@ -209,6 +215,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtCell(property, 1, 1)).toBe(key);
@@ -226,6 +233,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtCell(property, 1, 8)).toBe(value);
@@ -239,6 +247,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         expect(findAtCell(property, 1, 7)).toBe(property);
@@ -260,6 +269,7 @@ describe('ASTNode', () => {
         const property = new PropertyASTNodeImpl(
           key,
           value,
+          [],
           createStartLinePos(14)
         );
         // { "key"  "value" }
@@ -274,11 +284,13 @@ describe('ASTNode', () => {
         const property1 = new PropertyASTNodeImpl(
           new StringASTNodeImpl('key1', true, createLinePos(4, 5, 2, 3)),
           new StringASTNodeImpl('value1', true, createLinePos(11, 8, 2, 10)),
+          [],
           createLinePos(4, 15, 2, 3)
         );
         const property2 = new PropertyASTNodeImpl(
           new StringASTNodeImpl('key1', true, createLinePos(20, 5, 4, 3)),
           new StringASTNodeImpl('value1', true, createLinePos(30, 8, 4, 10)),
+          [],
           createLinePos(23, 15, 4, 3)
         );
         // {
