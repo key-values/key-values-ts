@@ -59,19 +59,19 @@ describe('ASTNode', () => {
   describe('findAtOffset', () => {
     describe('string node', () => {
       test('should be string for offset in string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtOffset(str, 0)).toBe(str);
         expect(findAtOffset(str, 3)).toBe(str);
         expect(findAtOffset(str, 7)).toBe(str);
       });
       test('should be null for offset before string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtOffset(str, -1)).toBe(null);
       });
       test('should be null for offset after string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtOffset(str, 8)).toBe(null);
       });
@@ -79,8 +79,12 @@ describe('ASTNode', () => {
     describe('property node', () => {
       test('should be key for offset in property key', () => {
         // "key"  "value"
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl(
+          'value',
+          true,
+          createLinePos(7, 7, 1, 7)
+        );
         const property = new PropertyASTNodeImpl(
           key,
           value,
@@ -92,8 +96,12 @@ describe('ASTNode', () => {
       });
       test('should be value for offset in property value', () => {
         // "key"  "value"
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl(
+          'value',
+          true,
+          createLinePos(7, 7, 1, 7)
+        );
         const property = new PropertyASTNodeImpl(
           key,
           value,
@@ -104,8 +112,8 @@ describe('ASTNode', () => {
         expect(findAtOffset(property, 13)).toBe(value);
       });
       test('should be property for offset in between key and value', () => {
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl('value', true, createLinePos(7, 7));
         // "key"  "value"
         const property = new PropertyASTNodeImpl(
           key,
@@ -125,8 +133,8 @@ describe('ASTNode', () => {
         expect(findAtOffset(obj, 2)).toBe(obj);
       });
       test('should be property key for offset in property key for single line object', () => {
-        const key = new StringASTNodeImpl('key', createLinePos(2, 5));
-        const value = new StringASTNodeImpl('value', createLinePos(9, 7));
+        const key = new StringASTNodeImpl('key', true, createLinePos(2, 5));
+        const value = new StringASTNodeImpl('value', true, createLinePos(9, 7));
         // __"key"  "value"
         const property = new PropertyASTNodeImpl(
           key,
@@ -143,13 +151,13 @@ describe('ASTNode', () => {
       test('should be object for offset in between property keys', () => {
         // __"key"  "value"
         const property1 = new PropertyASTNodeImpl(
-          new StringASTNodeImpl('key1', createLinePos(4, 5, 2, 3)),
-          new StringASTNodeImpl('value1', createLinePos(11, 8, 2, 10)),
+          new StringASTNodeImpl('key1', true, createLinePos(4, 5, 2, 3)),
+          new StringASTNodeImpl('value1', true, createLinePos(11, 8, 2, 10)),
           createLinePos(4, 15, 2, 3)
         );
         const property2 = new PropertyASTNodeImpl(
-          new StringASTNodeImpl('key1', createLinePos(20, 5, 4, 3)),
-          new StringASTNodeImpl('value1', createLinePos(30, 8, 4, 10)),
+          new StringASTNodeImpl('key1', true, createLinePos(20, 5, 4, 3)),
+          new StringASTNodeImpl('value1', true, createLinePos(30, 8, 4, 10)),
           createLinePos(23, 15, 4, 3)
         );
         // {
@@ -170,20 +178,20 @@ describe('ASTNode', () => {
   describe('findAtCell', () => {
     describe('string node', () => {
       test('should be string for cell in string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtCell(str, 1, 1)).toBe(str);
         expect(findAtCell(str, 1, 4)).toBe(str);
         expect(findAtCell(str, 1, 8)).toBe(str);
       });
       test('should be null for cell before string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtCell(str, 1, 0)).toBe(null);
         expect(findAtCell(str, 0, 5)).toBe(null);
       });
       test('should be null for cell after string', () => {
-        const str = new StringASTNodeImpl('value', createStartLinePos(7));
+        const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
 
         expect(findAtCell(str, 1, 9)).toBe(null);
         expect(findAtCell(str, 2, 5)).toBe(null);
@@ -192,8 +200,12 @@ describe('ASTNode', () => {
     describe('property node', () => {
       test('should be key for cell in property key', () => {
         // "key"  "value"
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl(
+          'value',
+          true,
+          createLinePos(7, 7, 1, 7)
+        );
         const property = new PropertyASTNodeImpl(
           key,
           value,
@@ -205,8 +217,12 @@ describe('ASTNode', () => {
       });
       test('should be value for cell in property value', () => {
         // "key"  "value"
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7, 1, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl(
+          'value',
+          true,
+          createLinePos(7, 7, 1, 7)
+        );
         const property = new PropertyASTNodeImpl(
           key,
           value,
@@ -217,8 +233,8 @@ describe('ASTNode', () => {
         expect(findAtCell(property, 1, 14)).toBe(value);
       });
       test('should be property for cell in between key and value', () => {
-        const key = new StringASTNodeImpl('key', createStartLinePos(5));
-        const value = new StringASTNodeImpl('value', createLinePos(7, 7));
+        const key = new StringASTNodeImpl('key', true, createStartLinePos(5));
+        const value = new StringASTNodeImpl('value', true, createLinePos(7, 7));
         // "key"  "value"
         const property = new PropertyASTNodeImpl(
           key,
@@ -238,8 +254,8 @@ describe('ASTNode', () => {
         expect(findAtCell(obj, 1, 3)).toBe(obj);
       });
       test('should be property key for cell in property key for single line object', () => {
-        const key = new StringASTNodeImpl('key', createLinePos(2, 5));
-        const value = new StringASTNodeImpl('value', createLinePos(9, 7));
+        const key = new StringASTNodeImpl('key', true, createLinePos(2, 5));
+        const value = new StringASTNodeImpl('value', true, createLinePos(9, 7));
         // __"key"  "value"
         const property = new PropertyASTNodeImpl(
           key,
@@ -256,13 +272,13 @@ describe('ASTNode', () => {
       test('should be object for cell in between property keys', () => {
         // __"key"  "value"
         const property1 = new PropertyASTNodeImpl(
-          new StringASTNodeImpl('key1', createLinePos(4, 5, 2, 3)),
-          new StringASTNodeImpl('value1', createLinePos(11, 8, 2, 10)),
+          new StringASTNodeImpl('key1', true, createLinePos(4, 5, 2, 3)),
+          new StringASTNodeImpl('value1', true, createLinePos(11, 8, 2, 10)),
           createLinePos(4, 15, 2, 3)
         );
         const property2 = new PropertyASTNodeImpl(
-          new StringASTNodeImpl('key1', createLinePos(20, 5, 4, 3)),
-          new StringASTNodeImpl('value1', createLinePos(30, 8, 4, 10)),
+          new StringASTNodeImpl('key1', true, createLinePos(20, 5, 4, 3)),
+          new StringASTNodeImpl('value1', true, createLinePos(30, 8, 4, 10)),
           createLinePos(23, 15, 4, 3)
         );
         // {

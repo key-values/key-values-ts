@@ -65,7 +65,7 @@ export default class KeyValuesParser {
         value.pos.columnEnd
       );
 
-      return new StringASTNodeImpl(value.text, pos);
+      return new StringASTNodeImpl(value.text, false, pos);
     };
 
     const applyQuotedString: (
@@ -85,7 +85,7 @@ export default class KeyValuesParser {
       // Resolve escaped quotes
       str = str.replace(/\\"/, '"');
 
-      return new StringASTNodeImpl(str, pos);
+      return new StringASTNodeImpl(str, true, pos);
     };
 
     const applyString: (value: StringASTNodeImpl) => StringASTNodeImpl = (
