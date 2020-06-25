@@ -63,10 +63,10 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
   public isQuoted: boolean;
   public value: string;
 
-  constructor(strValue: string, pos?: NodePosition) {
+  constructor(strValue: string, isQuoted?: boolean, pos?: NodePosition) {
     super(pos);
     this.value = strValue;
-    this.isQuoted = true;
+    this.isQuoted = isQuoted ?? true;
   }
 }
 
