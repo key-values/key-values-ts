@@ -84,6 +84,14 @@ describe('ASTNodeImpl', () => {
       const expected = [key, comment1, comment2, value];
       expect(property.children).toEqual(expected);
     });
+    test("should correctly assign key's and value's parent with property", () => {
+      const key = new StringASTNodeImpl('key');
+      const value = new StringASTNodeImpl('value');
+      const property = new PropertyASTNodeImpl(key, value);
+
+      expect(property.keyNode.parent).toBe(property);
+      expect(property.valueNode.parent).toBe(property);
+    });
   });
   // Object
   describe('ObjectASTNodeImpl', () => {

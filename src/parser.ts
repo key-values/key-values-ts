@@ -98,9 +98,8 @@ export default class KeyValuesParser {
     const applyComment: (
       value: Token<TokenKind.Comment>
     ) => CommentASTNodeImpl = (value) => {
-      const commentRegex = /\/\/\s*(.*?)\s*$/;
-      const commentMatch = value.text.match(commentRegex)?.groups;
-      const comment = commentMatch ? commentMatch[1] : '';
+      // Strip the comment value of the slashes and trim sourrounding whitespace
+      const comment = value.text.substr(2).trim();
 
       const pos = new NodePositionImpl(
         value.pos.index,
