@@ -99,7 +99,63 @@ describe('ASTNodeImpl', () => {
       const obj = new ObjectASTNodeImpl([]);
       expect(obj.type).toEqual('object');
     });
-    test('should correctly assign children to properties', () => {
+    test('should correctly assign properties', () => {
+      const property1 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 1'),
+        new StringASTNodeImpl('value 1')
+      );
+      const property2 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 2'),
+        new StringASTNodeImpl('value 2')
+      );
+      const obj = new ObjectASTNodeImpl([property1, property2]);
+
+      const expected = [property1, property2];
+      expect(obj.properties).toEqual(expected);
+    });
+    test('should correctly assign properties filtering comments', () => {
+      const comment1 = new CommentASTNodeImpl('Comment 1');
+      const property1 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 1'),
+        new StringASTNodeImpl('value 1')
+      );
+      const comment2 = new CommentASTNodeImpl('Comment 2');
+      const property2 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 2'),
+        new StringASTNodeImpl('value 2')
+      );
+      const obj = new ObjectASTNodeImpl([
+        comment1,
+        property1,
+        comment2,
+        property2,
+      ]);
+
+      const expected = [property1, property2];
+      expect(obj.properties).toEqual(expected);
+    });
+    test('should correctly assign comments filtering properties', () => {
+      const comment1 = new CommentASTNodeImpl('Comment 1');
+      const property1 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 1'),
+        new StringASTNodeImpl('value 1')
+      );
+      const comment2 = new CommentASTNodeImpl('Comment 2');
+      const property2 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 2'),
+        new StringASTNodeImpl('value 2')
+      );
+      const obj = new ObjectASTNodeImpl([
+        comment1,
+        property1,
+        comment2,
+        property2,
+      ]);
+
+      const expected = [comment1, comment2];
+      expect(obj.comments).toEqual(expected);
+    });
+    test('should correctly assign children with properties', () => {
       const property1 = new PropertyASTNodeImpl(
         new StringASTNodeImpl('key 1'),
         new StringASTNodeImpl('value 1')
@@ -113,19 +169,49 @@ describe('ASTNodeImpl', () => {
       const expected = [property1, property2];
       expect(obj.children).toEqual(expected);
     });
-    test("should correctly assign properties' parents to object", () => {
+    test('should correctly assign children with properties and comments', () => {
+      const comment1 = new CommentASTNodeImpl('Comment 1');
       const property1 = new PropertyASTNodeImpl(
         new StringASTNodeImpl('key 1'),
         new StringASTNodeImpl('value 1')
       );
+      const comment2 = new CommentASTNodeImpl('Comment 2');
       const property2 = new PropertyASTNodeImpl(
         new StringASTNodeImpl('key 2'),
         new StringASTNodeImpl('value 2')
       );
-      const obj = new ObjectASTNodeImpl([property1, property2]);
+      const obj = new ObjectASTNodeImpl([
+        comment1,
+        property1,
+        comment2,
+        property2,
+      ]);
 
-      expect(obj.properties[0].parent).toBe(obj);
-      expect(obj.properties[1].parent).toBe(obj);
+      const expected = [comment1, property1, comment2, property2];
+      expect(obj.children).toEqual(expected);
+    });
+    test("should correctly assign childrens' parents to object", () => {
+      const comment1 = new CommentASTNodeImpl('Comment 1');
+      const property1 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 1'),
+        new StringASTNodeImpl('value 1')
+      );
+      const comment2 = new CommentASTNodeImpl('Comment 2');
+      const property2 = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key 2'),
+        new StringASTNodeImpl('value 2')
+      );
+      const obj = new ObjectASTNodeImpl([
+        comment1,
+        property1,
+        comment2,
+        property2,
+      ]);
+
+      expect(obj.children[0].parent).toBe(obj);
+      expect(obj.children[1].parent).toBe(obj);
+      expect(obj.children[2].parent).toBe(obj);
+      expect(obj.children[3].parent).toBe(obj);
     });
   });
 });
