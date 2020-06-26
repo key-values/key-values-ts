@@ -48,9 +48,7 @@ export abstract class ASTNodeImpl {
     this.pos = pos;
   }
 
-  public get children(): ASTNode[] {
-    return [];
-  }
+  public children: ASTNode[] = [];
 
   public toString(): string {
     const parentStr = this.parent ? ` parent: {${this.parent.toString()}}` : '';
@@ -88,6 +86,7 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
   public keyNode: KeyASTNode;
   public valueNode: ValueASTNode;
   public comments: CommentASTNode[];
+  public children: Array<KeyASTNode | CommentASTNode | ValueASTNode>;
 
   constructor(
     keyNode: KeyASTNodeImpl,
@@ -100,26 +99,35 @@ export class PropertyASTNodeImpl extends ASTNodeImpl
     keyNode.parent = this;
     this.valueNode = valueNode;
     valueNode.parent = this;
+    comments?.forEach((comment) => (comment.parent = this));
     this.comments = comments ?? [];
-  }
-
-  public get children(): ASTNode[] {
-    return [this.keyNode, ...this.comments, this.valueNode];
+    this.children = [this.keyNode, ...this.comments, this.valueNode];
   }
 }
 
 export class ObjectASTNodeImpl extends ASTNodeImpl implements ObjectASTNode {
   public type: 'object' = 'object';
-  public properties: PropertyASTNode[];
   public value = undefined;
+  public children: Array<PropertyASTNodeImpl | CommentASTNodeImpl>;
 
-  constructor(properties: PropertyASTNodeImpl[], pos?: NodePosition) {
+  constructor(
+    children: Array<PropertyASTNodeImpl | CommentASTNodeImpl>,
+    pos?: NodePosition
+  ) {
     super(pos);
-    this.properties = properties;
-    properties.forEach((property) => (property.parent = this));
+    children.forEach((child) => (child.parent = this));
+    this.children = children;
   }
 
-  public get children(): ASTNode[] {
-    return this.properties;
+  public get properties(): PropertyASTNode[] {
+    return this.children.filter(
+      (child) => child.type === 'property'
+    ) as PropertyASTNodeImpl[];
+  }
+
+  public get comments(): CommentASTNode[] {
+    return this.children.filter(
+      (child) => child.type === 'comment'
+    ) as CommentASTNodeImpl[];
   }
 }

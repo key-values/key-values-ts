@@ -40,6 +40,7 @@ export interface PropertyASTNode extends BaseASTNode {
 export interface ObjectASTNode extends BaseASTNode {
   readonly type: 'object';
   readonly properties: PropertyASTNode[];
+  readonly comments: CommentASTNode[];
   readonly children: ASTNode[];
 }
 
