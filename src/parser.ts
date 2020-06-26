@@ -8,11 +8,8 @@ import {
   seq,
   alt,
   opt_sc,
-  list_sc,
   kmid,
   Parser,
-  kleft,
-  kright,
   rep_sc,
   Lexer,
 } from 'typescript-parsec';
@@ -30,13 +27,20 @@ import {
 
 import { TokenKind, lexer } from './lexer';
 
+export type Trivia = CommentASTNodeImpl | null;
+export type ObjectChild = PropertyASTNodeImpl | CommentASTNodeImpl;
+export type PropertyChild =
+  | KeyASTNodeImpl
+  | ValueASTNodeImpl
+  | CommentASTNodeImpl;
+
 export default class KeyValuesParser {
   public lexer: Lexer<TokenKind>;
 
   // Non-recursive parsers
   public space: Parser<TokenKind, null>;
   public comment: Parser<TokenKind, CommentASTNodeImpl>;
-  public trivia: Parser<TokenKind, CommentASTNodeImpl | null>;
+  public trivia: Parser<TokenKind, Trivia>;
   public openBrace: Parser<TokenKind, Token<TokenKind.LBrace>>;
   public closeBrace: Parser<TokenKind, Token<TokenKind.RBrace>>;
   public unquotedString: Parser<TokenKind, StringASTNodeImpl>;
@@ -115,9 +119,7 @@ export default class KeyValuesParser {
 
     const applySpace: (value: Token<TokenKind.Space>) => null = () => null;
 
-    const applyTrivia: (
-      value: CommentASTNodeImpl | null
-    ) => CommentASTNodeImpl | null = (value) => {
+    const applyTrivia: (value: Trivia) => Trivia = (value) => {
       return value;
     };
 
@@ -132,11 +134,7 @@ export default class KeyValuesParser {
     };
 
     const applyProperty: (
-      value: [
-        KeyASTNodeImpl,
-        Array<CommentASTNodeImpl | null>,
-        ValueASTNodeImpl
-      ]
+      value: [KeyASTNodeImpl, Trivia[], ValueASTNodeImpl]
     ) => PropertyASTNodeImpl = (values) => {
       const key = values[0];
       const trivia = values[1];
@@ -164,13 +162,34 @@ export default class KeyValuesParser {
     const applyObject: (
       values: [
         Token<TokenKind.LBrace>,
-        PropertyASTNodeImpl[] | undefined,
+        Trivia[],
+        [PropertyASTNodeImpl, Trivia[]][] | undefined,
+        Trivia[],
         Token<TokenKind.RBrace>
       ]
     ) => ObjectASTNodeImpl = (values) => {
       const lBrace = values[0];
-      const properties = values[1] || [];
-      const rBrace = values[2];
+      const preComments: ObjectChild[] = triviaToComments(values[1]);
+      const rawChildren = values[2] || [];
+      const postComments: ObjectChild[] = triviaToComments(values[3]);
+      const rBrace = values[4];
+
+      const children: ObjectChild[] =
+        // The comments before the properties
+        preComments
+          .concat(
+            // ...combined with the properties and comments
+            rawChildren
+              .map((child) => {
+                // Combine property and comments
+                return ([child[0]] as ObjectChild[]).concat(
+                  triviaToComments(child[1]) as ObjectChild[]
+                );
+              })
+              .reduce((a, b) => a.concat(b), [])
+          )
+          // ...combined with the comments after the properties
+          .concat(postComments);
 
       const pos = new NodePositionImpl(
         lBrace.pos.index,
@@ -181,9 +200,7 @@ export default class KeyValuesParser {
         rBrace.pos.columnEnd
       );
 
-      const object = new ObjectASTNodeImpl(properties, pos);
-      properties.forEach((property) => (property.parent = object));
-
+      const object = new ObjectASTNodeImpl(children, pos);
       return object;
     };
 
@@ -221,21 +238,19 @@ export default class KeyValuesParser {
     object.setPattern(
       apply(
         seq(
-          kleft(
-            this.openBrace, // A left brace ({) ...
-            rep_sc(this.trivia) // ...followed by some trivia...
-          ),
+          this.openBrace, // A left brace ({) ...
+          rep_sc(this.trivia), // ...followed by some trivia...
           opt_sc(
             // ...followed by an optional list of properties...
-            list_sc(
-              property, //...containing properties...
-              some_sc(this.trivia) // ...separated by space or comments.
+            rep_sc(
+              seq(
+                property, //...containing properties...
+                some_sc(this.trivia) // ...separated by space or comments.
+              )
             )
           ),
-          kright(
-            rep_sc(this.trivia), // ...followed by some trivia...
-            this.closeBrace // ...follwed by a right brace (}).
-          )
+          rep_sc(this.trivia), // ...followed by some trivia...
+          this.closeBrace // ...follwed by a right brace (}).
         ),
         applyObject
       )
@@ -252,6 +267,10 @@ export default class KeyValuesParser {
     this.object = object;
     this.keyValues = keyValues;
   }
+}
+
+function triviaToComments(trivia: Trivia[]): CommentASTNodeImpl[] {
+  return trivia.filter((item) => item !== null) as CommentASTNodeImpl[];
 }
 
 export function some_sc<TKind, TResult>(
