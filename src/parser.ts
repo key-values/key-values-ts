@@ -35,16 +35,24 @@ export type PropertyChild =
   | CommentASTNodeImpl;
 
 export interface ParserOptions {
-  /** Determines if the parser should include comments in the AST. */
+  /** Determines if the parser should include comments in the AST.
+   * Defaults to false.
+   */
   collectComments?: boolean;
+  /** Determines if string escaping should be enabled.
+   * Defaults to false.
+   */
+  escapeStrings?: boolean;
 }
 
 export interface ParserSettings extends ParserOptions {
   collectComments: boolean;
+  escapeStrings: boolean;
 }
 
 export const DEFAULT_SETTINGS: ParserSettings = {
   collectComments: false,
+  escapeStrings: false,
 };
 
 /** Converts the given options to settings. */
@@ -54,6 +62,7 @@ export function getSettings(options?: ParserOptions): ParserSettings {
   return {
     collectComments:
       options.collectComments ?? DEFAULT_SETTINGS.collectComments,
+    escapeStrings: options.escapeStrings ?? DEFAULT_SETTINGS.escapeStrings,
   };
 }
 
