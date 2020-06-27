@@ -187,6 +187,34 @@ describe('Parser', () => {
       const property3 = result.properties[2];
       expect(property3.keyNode.value).toEqual('key3');
       expect(property3.valueNode?.value).toEqual('value3');
+      expect(result.comments.length).toBe(0);
+    });
+    test('should include comments in the AST if enabled', () => {
+      const commentParser = new KeyValuesParser({ collectComments: true });
+      const text = `{// Comment 1
+        "key1" "value1"//Comment 2
+        // Comment 3
+        "key2" "value2"
+        "key3" "value3"
+        // Comment 4
+      }`;
+      const result = parseWith(text, commentParser.object);
+
+      expect(result.type).toEqual('object');
+      expect(result.properties.length).toBe(3);
+      assertStartPos(result, 146, 7, 8);
+
+      const property1 = result.properties[0];
+      expect(property1.keyNode.value).toEqual('key1');
+      expect(property1.valueNode?.value).toEqual('value1');
+      const property2 = result.properties[1];
+      expect(property2.keyNode.value).toEqual('key2');
+      expect(property2.valueNode?.value).toEqual('value2');
+      const property3 = result.properties[2];
+      expect(property3.keyNode.value).toEqual('key3');
+      expect(property3.valueNode?.value).toEqual('value3');
+      expect(result.comments.length).toBe(4);
+      expect(result.children.length).toBe(7);
     });
     test('should parse nested object', () => {
       const text = `{ 
@@ -271,12 +299,21 @@ describe('Parser', () => {
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
-      expect(result.comments.length).toBe(1);
-      expect(result.comments[0].value).toEqual('Comment');
+      expect(result.comments.length).toBe(0);
     });
     test('should allow comments between key and object value', () => {
       const text = `"key"// Comment\n{ "key1"\t"value1" }`;
       const result = parseWith(text, parser.property);
+
+      expect(result.type).toEqual('property');
+      expect(result.keyNode.value).toEqual('key');
+      expect(result.valueNode.type).toEqual('object');
+      expect(result.comments.length).toBe(0);
+    });
+    test('should include comments in the AST if enabled', () => {
+      const commentParser = new KeyValuesParser({ collectComments: true });
+      const text = `"key"// Comment\n{ "key1"\t"value1" }`;
+      const result = parseWith(text, commentParser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
