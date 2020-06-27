@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as NodeParser from './node_parser';
-import KeyValuesParser, { parseWith } from './parser';
+import KeyValuesParser, { parseWith, ParserOptions } from './parser';
 import * as NodeStringifier from './node_stringifier';
 import * as ObjectParser from './object_parser';
 import { ASTNode, findAtOffset, findAtCell } from './ast_node';
@@ -10,8 +10,11 @@ export class KeyValuesDocument {
   constructor(public readonly root: ASTNode | undefined) {}
 
   /** Creates a KeyValues document from a text. */
-  public static fromText(text: string): KeyValuesDocument {
-    const parser = new KeyValuesParser();
+  public static fromText(
+    text: string,
+    options?: ParserOptions
+  ): KeyValuesDocument {
+    const parser = new KeyValuesParser(options);
     const root = parseWith(text, parser.keyValues);
 
     return new KeyValuesDocument(root);
@@ -87,8 +90,8 @@ export class KeyValuesDocument {
 }
 
 /** Converts a KeyValues string into an object. */
-export function parse(text: string): unknown {
-  return KeyValuesDocument.fromText(text).toObject();
+export function parse(text: string, options?: ParserOptions): unknown {
+  return KeyValuesDocument.fromText(text, options).toObject();
 }
 
 /** Converts a JavaScript value into a KeyValues string. */
