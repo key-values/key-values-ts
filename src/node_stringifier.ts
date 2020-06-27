@@ -14,21 +14,21 @@ export interface StringifyOptions {
   alignValues?: boolean;
 }
 
-interface StringifySettings extends StringifyOptions {
+export interface StringifySettings extends StringifyOptions {
   tabSize: number;
   insertSpaces: boolean;
   alignValues: boolean;
 }
 
 /** The default stringify settings. */
-const DEFAULT_SETTINGS: StringifySettings = {
+export const DEFAULT_SETTINGS: StringifySettings = {
   tabSize: 4,
   insertSpaces: false,
   alignValues: false,
 };
 
 /** Converts the given options to settings. */
-function getSettings(options?: StringifyOptions): StringifySettings {
+export function getSettings(options?: StringifyOptions): StringifySettings {
   if (!options) return DEFAULT_SETTINGS;
 
   return {
