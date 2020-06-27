@@ -2,6 +2,7 @@ import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
+  CommentASTNodeImpl,
 } from '../src/ast_node_impl';
 import * as NodeStringifier from '../src/node_stringifier';
 
@@ -64,11 +65,43 @@ describe('NodeStringifier', () => {
       expect(NodeStringifier.stringifyStringNode(node)).toEqual(expected);
     });
   });
+  // Comment node
+  describe('stringifyCommentNode', () => {
+    test('should stringify simple comment', () => {
+      const node = new CommentASTNodeImpl('Comment');
+      const expected = '// Comment';
+
+      expect(NodeStringifier.stringifyCommentNode(node)).toEqual(expected);
+    });
+  });
   // Property node
   describe('stringifyPropertyNode', () => {
     test('should stringify simple string property with tab indention', () => {
       const node = createStringPropertyNode('key', 'value');
       const expected = '"key"\t"value"';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify string property with single comment', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key'),
+        new StringASTNodeImpl('value'),
+        [new CommentASTNodeImpl('Comment 1')]
+      );
+      const expected = '"key"\n// Comment 1\n"value"';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify string property with multiple comments', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key'),
+        new StringASTNodeImpl('value'),
+        [
+          new CommentASTNodeImpl('Comment 1'),
+          new CommentASTNodeImpl('Comment 2'),
+        ]
+      );
+      const expected = '"key"\n// Comment 1\n// Comment 2\n"value"';
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
     });
@@ -99,6 +132,16 @@ describe('NodeStringifier', () => {
         new ObjectASTNodeImpl([])
       );
       const expected = '"key"\t{}';
+
+      expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
+    });
+    test('should stringify empty object value with comment', () => {
+      const node = new PropertyASTNodeImpl(
+        new StringASTNodeImpl('key'),
+        new ObjectASTNodeImpl([]),
+        [new CommentASTNodeImpl('Comment 1')]
+      );
+      const expected = '"key"\n// Comment 1\n{}';
 
       expect(NodeStringifier.stringifyPropertyNode(node)).toEqual(expected);
     });
@@ -163,11 +206,29 @@ describe('NodeStringifier', () => {
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
+    test('should stringify empty object with comment', () => {
+      const node = new ObjectASTNodeImpl([new CommentASTNodeImpl('Comment 1')]);
+      // {
+      //   // Comment 1
+      // }
+      const expected = '{\n\t// Comment 1\n}';
+
+      expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
+    });
     test('should stringify single string-property object', () => {
       const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key', 'value'),
       ]);
       const expected = '{ "key"\t"value" }';
+
+      expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
+    });
+    test('should stringify single string-property object with comment', () => {
+      const node = new ObjectASTNodeImpl([
+        new CommentASTNodeImpl('Comment 1'),
+        createStringPropertyNode('key', 'value'),
+      ]);
+      const expected = '{\n\t// Comment 1\n\t"key"\t"value"\n}';
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
@@ -194,6 +255,27 @@ describe('NodeStringifier', () => {
       //   "key3"  "value3"
       // }
       const expected = `{\n\t"key1"\t"value1"\n\t"key2"\t"value2"\n\t"key3"\t"value3"\n}`;
+
+      expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
+    });
+    test('should stringify multi-line object with comments', () => {
+      const node = new ObjectASTNodeImpl([
+        new CommentASTNodeImpl('Comment 1'),
+        createStringPropertyNode('key1', 'value1'),
+        createStringPropertyNode('key2', 'value2'),
+        new CommentASTNodeImpl('Comment 2'),
+        createStringPropertyNode('key3', 'value3'),
+        new CommentASTNodeImpl('Comment 3'),
+      ]);
+      // {
+      //   // Comment 1
+      //   "key1"  "value1"
+      //   "key2"  "value2"
+      //   // Comment 2
+      //   "key3"  "value3"
+      //   // Comment 3
+      // }
+      const expected = `{\n\t// Comment 1\n\t"key1"\t"value1"\n\t"key2"\t"value2"\n\t// Comment 2\n\t"key3"\t"value3"\n\t// Comment 3\n}`;
 
       expect(NodeStringifier.stringifyObjectNode(node)).toEqual(expected);
     });
