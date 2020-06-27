@@ -11,7 +11,6 @@ import {
   kmid,
   Parser,
   rep_sc,
-  Lexer,
 } from 'typescript-parsec';
 
 import {
@@ -25,7 +24,7 @@ import {
   CommentASTNodeImpl,
 } from './ast_node_impl';
 
-import { TokenKind, lexer } from './lexer';
+import KeyValuesLexer, { TokenKind } from './lexer';
 
 export type Trivia = CommentASTNodeImpl | null;
 export type ObjectChild = PropertyASTNodeImpl | CommentASTNodeImpl;
@@ -67,7 +66,7 @@ export function getSettings(options?: ParserOptions): ParserSettings {
 }
 
 export default class KeyValuesParser {
-  public lexer: Lexer<TokenKind>;
+  public lexer: KeyValuesLexer;
   public settings: ParserSettings;
 
   // Non-recursive parsers
@@ -88,7 +87,7 @@ export default class KeyValuesParser {
   public keyValues: Parser<TokenKind, KeyValuesASTNodeImpl>;
 
   constructor(options?: ParserOptions) {
-    this.lexer = lexer;
+    this.lexer = new KeyValuesLexer(options);
     this.settings = getSettings(options);
 
     // Apply functions
@@ -324,6 +323,7 @@ export function some_sc<TKind, TResult>(
 
 export function parseWith<TResult>(
   text: string,
+  lexer: KeyValuesLexer,
   parser: Parser<TokenKind, TResult>
 ): TResult {
   return expectSingleResult(expectEOF(parser.parse(lexer.parse(text))));

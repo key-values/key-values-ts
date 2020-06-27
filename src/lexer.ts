@@ -1,4 +1,5 @@
-import { buildLexer } from 'typescript-parsec';
+import { buildLexer, Lexer, Token } from 'typescript-parsec';
+import { ParserOptions } from './parser';
 
 export enum TokenKind {
   LBrace,
@@ -9,11 +10,40 @@ export enum TokenKind {
   QuotedString,
 }
 
-export const lexer = buildLexer([
-  [true, /^\{/g, TokenKind.LBrace],
-  [true, /^\}/g, TokenKind.RBrace],
-  [true, /^\s+/g, TokenKind.Space],
-  [true, /^[/][/][^\n]*\s*/g, TokenKind.Comment],
-  [true, /^[^\s{}"]+/g, TokenKind.UnquotedString],
-  [true, /^(?<!\\)"(?:[^"]|(?:\\"))*(?<!\\)"/g, TokenKind.QuotedString],
-]);
+export type TokenDef = [boolean, RegExp, TokenKind];
+
+export default class KeyValuesLexer {
+  public lexer: Lexer<TokenKind>;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(options?: ParserOptions) {
+    const openBrace: TokenDef = [true, /^\{/g, TokenKind.LBrace];
+    const closeBrace: TokenDef = [true, /^\}/g, TokenKind.RBrace];
+    const space: TokenDef = [true, /^\s+/g, TokenKind.Space];
+    const comment: TokenDef = [true, /^[/][/][^\n]*\s*/g, TokenKind.Comment];
+    const unquotedString: TokenDef = [
+      true,
+      /^[^\s{}"]+/g,
+      TokenKind.UnquotedString,
+    ];
+    const quotedString: TokenDef = [
+      true,
+      /^(?<!\\)"(?:[^"]|(?:\\"))*(?<!\\)"/g,
+      TokenKind.QuotedString,
+    ];
+
+    this.lexer = buildLexer([
+      openBrace,
+      closeBrace,
+      space,
+      comment,
+      unquotedString,
+      quotedString,
+    ]);
+  }
+
+  /** Parses the given text into tokens. */
+  public parse(input: string): Token<TokenKind> | undefined {
+    return this.lexer.parse(input);
+  }
+}

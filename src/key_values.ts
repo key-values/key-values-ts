@@ -15,7 +15,7 @@ export class KeyValuesDocument {
     options?: ParserOptions
   ): KeyValuesDocument {
     const parser = new KeyValuesParser(options);
-    const root = parseWith(text, parser.keyValues);
+    const root = parseWith(text, parser.lexer, parser.keyValues);
 
     return new KeyValuesDocument(root);
   }
