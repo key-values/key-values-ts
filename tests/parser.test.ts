@@ -11,7 +11,7 @@ describe('Parser', () => {
   describe('unquoted string', () => {
     test('should parse simple string', () => {
       const text = `value`;
-      const result = parseWith(text, parser.unquotedString);
+      const result = parseWith(text, parser.lexer, parser.unquotedString);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy();
@@ -23,7 +23,7 @@ describe('Parser', () => {
   describe('quoted string', () => {
     test('should parse simple string', () => {
       const text = `"value"`;
-      const result = parseWith(text, parser.quotedString);
+      const result = parseWith(text, parser.lexer, parser.quotedString);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -32,7 +32,7 @@ describe('Parser', () => {
     });
     test('should parse string with spacing', () => {
       const text = `"value 1 and 2"`;
-      const result = parseWith(text, parser.quotedString);
+      const result = parseWith(text, parser.lexer, parser.quotedString);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -41,7 +41,7 @@ describe('Parser', () => {
     });
     test('should allow escaped double quote', () => {
       const text = `"value\\"WithQuote"`;
-      const result = parseWith(text, parser.quotedString);
+      const result = parseWith(text, parser.lexer, parser.quotedString);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -53,7 +53,7 @@ describe('Parser', () => {
   describe('string', () => {
     test('should parse simple unquoted string', () => {
       const text = `value`;
-      const result = parseWith(text, parser.string);
+      const result = parseWith(text, parser.lexer, parser.string);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy();
@@ -62,7 +62,7 @@ describe('Parser', () => {
     });
     test('should parse simple quotedstring', () => {
       const text = `"value"`;
-      const result = parseWith(text, parser.string);
+      const result = parseWith(text, parser.lexer, parser.string);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -71,7 +71,7 @@ describe('Parser', () => {
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
-      const result = parseWith(text, parser.string);
+      const result = parseWith(text, parser.lexer, parser.string);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -83,7 +83,7 @@ describe('Parser', () => {
   describe('comment', () => {
     test('should parse simple comment', () => {
       const text = `// Comment`;
-      const result = parseWith(text, parser.comment);
+      const result = parseWith(text, parser.lexer, parser.comment);
 
       expect(result.type).toEqual('comment');
       expect(result.value).toEqual('Comment');
@@ -94,7 +94,7 @@ describe('Parser', () => {
   describe('key', () => {
     test('should parse simple unquoted string', () => {
       const text = `value`;
-      const result = parseWith(text, parser.key);
+      const result = parseWith(text, parser.lexer, parser.key);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeFalsy;
@@ -103,7 +103,7 @@ describe('Parser', () => {
     });
     test('should parse simple quoted string', () => {
       const text = `"value"`;
-      const result = parseWith(text, parser.key);
+      const result = parseWith(text, parser.lexer, parser.key);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -112,7 +112,7 @@ describe('Parser', () => {
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
-      const result = parseWith(text, parser.key);
+      const result = parseWith(text, parser.lexer, parser.key);
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
@@ -124,7 +124,7 @@ describe('Parser', () => {
   describe('object', () => {
     test('should parse empty object', () => {
       const text = `{}`;
-      const result = parseWith(text, parser.object);
+      const result = parseWith(text, parser.lexer, parser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties).toEqual([]);
@@ -132,7 +132,7 @@ describe('Parser', () => {
     });
     test('should parse simple single string object', () => {
       const text = `{ "key" "value" }`;
-      const result = parseWith(text, parser.object);
+      const result = parseWith(text, parser.lexer, parser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(1);
@@ -148,7 +148,7 @@ describe('Parser', () => {
         "key2" "value2"
         "key3" "value3"
       }`;
-      const result = parseWith(text, parser.object);
+      const result = parseWith(text, parser.lexer, parser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
@@ -172,7 +172,7 @@ describe('Parser', () => {
         "key3" "value3"
         // Comment 4
       }`;
-      const result = parseWith(text, parser.object);
+      const result = parseWith(text, parser.lexer, parser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
@@ -198,7 +198,7 @@ describe('Parser', () => {
         "key3" "value3"
         // Comment 4
       }`;
-      const result = parseWith(text, commentParser.object);
+      const result = parseWith(text, parser.lexer, commentParser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
@@ -225,7 +225,7 @@ describe('Parser', () => {
         }
         "key3" "value3"
       }`;
-      const result = parseWith(text, parser.object);
+      const result = parseWith(text, parser.lexer, parser.object);
 
       expect(result.type).toEqual('object');
       expect(result.properties.length).toBe(3);
@@ -249,7 +249,7 @@ describe('Parser', () => {
   describe('value', () => {
     test('should parse simple unquoted string', () => {
       const text = `value`;
-      const result = parseWith(text, parser.value);
+      const result = parseWith(text, parser.lexer, parser.value);
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value');
@@ -257,7 +257,7 @@ describe('Parser', () => {
     });
     test('should parse simple quotedstring', () => {
       const text = `"value"`;
-      const result = parseWith(text, parser.value);
+      const result = parseWith(text, parser.lexer, parser.value);
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value');
@@ -265,7 +265,7 @@ describe('Parser', () => {
     });
     test('should parse quoted string with spacing', () => {
       const text = `"value 1 and 2"`;
-      const result = parseWith(text, parser.value);
+      const result = parseWith(text, parser.lexer, parser.value);
 
       expect(result.type).toEqual('string');
       expect(result.value).toEqual('value 1 and 2');
@@ -276,7 +276,7 @@ describe('Parser', () => {
   describe('property', () => {
     test('should parse simple string property', () => {
       const text = `"key" "value"`;
-      const result = parseWith(text, parser.property);
+      const result = parseWith(text, parser.lexer, parser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -285,7 +285,7 @@ describe('Parser', () => {
     });
     test('should parse empty object property', () => {
       const text = `"key" {}`;
-      const result = parseWith(text, parser.property);
+      const result = parseWith(text, parser.lexer, parser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -294,7 +294,7 @@ describe('Parser', () => {
     });
     test('should allow comments between key and string value', () => {
       const text = `"key"// Comment\n"value"`;
-      const result = parseWith(text, parser.property);
+      const result = parseWith(text, parser.lexer, parser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -303,7 +303,7 @@ describe('Parser', () => {
     });
     test('should allow comments between key and object value', () => {
       const text = `"key"// Comment\n{ "key1"\t"value1" }`;
-      const result = parseWith(text, parser.property);
+      const result = parseWith(text, parser.lexer, parser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -313,7 +313,7 @@ describe('Parser', () => {
     test('should include comments in the AST if enabled', () => {
       const commentParser = new KeyValuesParser({ collectComments: true });
       const text = `"key"// Comment\n{ "key1"\t"value1" }`;
-      const result = parseWith(text, commentParser.property);
+      const result = parseWith(text, parser.lexer, commentParser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -323,7 +323,7 @@ describe('Parser', () => {
     });
     test('should parse simple single string object property', () => {
       const text = `"key1" { "key1.1" "value1.1" }`;
-      const result = parseWith(text, parser.property);
+      const result = parseWith(text, parser.lexer, parser.property);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key1');
@@ -335,7 +335,7 @@ describe('Parser', () => {
   describe('key values', () => {
     test('should parse simple string property', () => {
       const text = `"key" "value"`;
-      const result = parseWith(text, parser.keyValues);
+      const result = parseWith(text, parser.lexer, parser.keyValues);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -344,7 +344,7 @@ describe('Parser', () => {
     });
     test('should parse object property', () => {
       const text = `"key" {}`;
-      const result = parseWith(text, parser.keyValues);
+      const result = parseWith(text, parser.lexer, parser.keyValues);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
@@ -355,7 +355,7 @@ describe('Parser', () => {
       const text = `  
          "key" "value"   
          `;
-      const result = parseWith(text, parser.keyValues);
+      const result = parseWith(text, parser.lexer, parser.keyValues);
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
       expect(result.valueNode.value).toEqual('value');
@@ -366,7 +366,7 @@ describe('Parser', () => {
         // Comment 1
         "key" "value"   // Comment 2
         // Comment 3`;
-      const result = parseWith(text, parser.keyValues);
+      const result = parseWith(text, parser.lexer, parser.keyValues);
 
       expect(result.type).toEqual('property');
       expect(result.keyNode.value).toEqual('key');
