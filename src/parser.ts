@@ -59,6 +59,7 @@ export function getSettings(options?: ParserOptions): ParserSettings {
 
 export default class KeyValuesParser {
   public lexer: Lexer<TokenKind>;
+  public settings: ParserSettings;
 
   // Non-recursive parsers
   public space: Parser<TokenKind, null>;
@@ -77,8 +78,9 @@ export default class KeyValuesParser {
   public object: Parser<TokenKind, ObjectASTNodeImpl>;
   public keyValues: Parser<TokenKind, KeyValuesASTNodeImpl>;
 
-  constructor() {
+  constructor(options?: ParserOptions) {
     this.lexer = lexer;
+    this.settings = getSettings(options);
 
     // Apply functions
     const applyUnquotedString: (
@@ -174,9 +176,10 @@ export default class KeyValuesParser {
         value.pos.columnEnd
       );
 
-      const comments = trivia.filter(
-        (item) => item !== null
-      ) as CommentASTNodeImpl[];
+      // If enabled, include comments in the AST
+      const comments = this.settings.collectComments
+        ? (trivia.filter((item) => item !== null) as CommentASTNodeImpl[])
+        : [];
       const property = new PropertyASTNodeImpl(key, value, comments, pos);
 
       return property;
@@ -197,22 +200,28 @@ export default class KeyValuesParser {
       const postComments: ObjectChild[] = triviaToComments(values[3]);
       const rBrace = values[4];
 
-      const children: ObjectChild[] =
-        // The comments before the properties
-        preComments
-          .concat(
-            // ...combined with the properties and comments
-            rawChildren
-              .map((child) => {
-                // Combine property and comments
-                return ([child[0]] as ObjectChild[]).concat(
-                  triviaToComments(child[1]) as ObjectChild[]
-                );
-              })
-              .reduce((a, b) => a.concat(b), [])
-          )
-          // ...combined with the comments after the properties
-          .concat(postComments);
+      const children: ObjectChild[] = this.settings.collectComments
+        ? // Include comments in the AST if enabled
+          // The comments before the properties...
+          preComments
+            .concat(
+              // ...combined with the properties and comments...
+              rawChildren
+                .map((child) => {
+                  // Combine property and comments
+                  return ([child[0]] as ObjectChild[]).concat(
+                    triviaToComments(child[1]) as ObjectChild[]
+                  );
+                })
+                .reduce((a, b) => a.concat(b), [])
+            )
+            // ...combined with the comments after the properties.
+            .concat(postComments)
+        : // If comments are disabled, only include the properties
+          rawChildren.map((child) => {
+            // Extract property
+            return child[0] as ObjectChild;
+          });
 
       const pos = new NodePositionImpl(
         lBrace.pos.index,
