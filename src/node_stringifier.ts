@@ -3,6 +3,7 @@ import {
   PropertyASTNode,
   ObjectASTNode,
   ASTNode,
+  CommentASTNode,
 } from './ast_node';
 
 export interface StringifyOptions {
@@ -69,6 +70,16 @@ export function stringifyStringNode(
   return `${indentStr}"${node.value}"`;
 }
 
+/** Converts a CommentASTNode to a KeyValues string. */
+export function stringifyCommentNode(
+  node: CommentASTNode,
+  options?: StringifyOptions,
+  indent?: number
+): string {
+  const indentStr = genIndent(options, indent);
+  return `${indentStr}// ${node.value}`;
+}
+
 /** Converts a PropertyASTNode to a KeyValues string. */
 export function stringifyPropertyNode(
   node: PropertyASTNode,
@@ -78,10 +89,26 @@ export function stringifyPropertyNode(
 ): string {
   const key = stringifyStringNode(node.keyNode, options, indent);
 
-  if (node.valueNode.type == 'object' && node.valueNode.properties.length > 0) {
-    // Object values are placed in a new line
-    const value = stringifyObjectNode(node.valueNode, options, indent);
-    return `${key}\n${value}`;
+  if (
+    // Includes comments...
+    node.comments.length > 0 ||
+    // ...or has a multi-property object value
+    (node.valueNode.type == 'object' && node.valueNode.properties.length > 0)
+  ) {
+    // Stringify comments
+    let comments = '';
+    if (node.comments.length > 0) {
+      comments =
+        '\n' +
+        node.comments
+          .map((comment) =>
+            stringifyCommentNode(comment as CommentASTNode, options, indent)
+          )
+          .join('\n');
+    }
+
+    const value = stringifyNode(node.valueNode, options, indent);
+    return `${key}${comments}\n${value}`;
   } else {
     // String values and empty objects are placed in the same line
     let indentStr = genIndent(options, 1);
@@ -119,11 +146,12 @@ export function stringifyObjectNode(
 ): string {
   const indentStr = genIndent(options, indent);
 
-  if (node.properties.length === 0) {
+  if (node.children.length === 0) {
     // Empty object
     return `${indentStr}{}`;
   } else if (
     node.properties.length === 1 &&
+    node.comments.length === 0 &&
     node.properties[0].valueNode.type === 'string'
   ) {
     // Single-line object
@@ -142,18 +170,25 @@ export function stringifyObjectNode(
         }
       });
     }
-    const properties = node.properties
-      .map((property) => {
-        return stringifyPropertyNode(
-          property,
-          options,
-          (indent ?? 0) + 1,
-          maxKeyLength
-        );
+    const children = node.children
+      .map((child) => {
+        const childIndent = (indent ?? 0) + 1;
+        if (child.type === 'property') {
+          const property = child as PropertyASTNode;
+          return stringifyPropertyNode(
+            property,
+            options,
+            childIndent,
+            maxKeyLength
+          );
+        } else {
+          const comment = child as CommentASTNode;
+          return stringifyCommentNode(comment, options, childIndent);
+        }
       })
       .join('\n');
 
-    return `${indentStr}{\n${properties}\n${indentStr}}`;
+    return `${indentStr}{\n${children}\n${indentStr}}`;
   }
 }
 
@@ -166,6 +201,8 @@ export function stringifyNode(
   switch (node.type) {
     case 'string':
       return stringifyStringNode(node as StringASTNode, options, indent);
+    case 'comment':
+      return stringifyCommentNode(node as CommentASTNode, options, indent);
     case 'property':
       return stringifyPropertyNode(node as PropertyASTNode, options, indent);
     case 'object':
