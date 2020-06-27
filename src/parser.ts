@@ -34,6 +34,29 @@ export type PropertyChild =
   | ValueASTNodeImpl
   | CommentASTNodeImpl;
 
+export interface ParserOptions {
+  /** Determines if the parser should include comments in the AST. */
+  collectComments?: boolean;
+}
+
+export interface ParserSettings extends ParserOptions {
+  collectComments: boolean;
+}
+
+export const DEFAULT_SETTINGS: ParserSettings = {
+  collectComments: false,
+};
+
+/** Converts the given options to settings. */
+export function getSettings(options?: ParserOptions): ParserSettings {
+  if (!options) return DEFAULT_SETTINGS;
+
+  return {
+    collectComments:
+      options.collectComments ?? DEFAULT_SETTINGS.collectComments,
+  };
+}
+
 export default class KeyValuesParser {
   public lexer: Lexer<TokenKind>;
 
