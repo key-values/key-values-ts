@@ -1,5 +1,5 @@
 import { buildLexer, Lexer, Token } from 'typescript-parsec';
-import { ParserOptions } from './parser';
+import { ParserOptions, ParserSettings, getSettings } from './parser';
 
 export enum TokenKind {
   LBrace,
@@ -14,9 +14,12 @@ export type TokenDef = [boolean, RegExp, TokenKind];
 
 export default class KeyValuesLexer {
   public lexer: Lexer<TokenKind>;
+  public settings: ParserSettings;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(options?: ParserOptions) {
+    this.settings = getSettings(options);
+
     const openBrace: TokenDef = [true, /^\{/g, TokenKind.LBrace];
     const closeBrace: TokenDef = [true, /^\}/g, TokenKind.RBrace];
     const space: TokenDef = [true, /^\s+/g, TokenKind.Space];
@@ -26,11 +29,17 @@ export default class KeyValuesLexer {
       /^[^\s{}"]+/g,
       TokenKind.UnquotedString,
     ];
-    const quotedString: TokenDef = [
-      true,
-      /^(?<!\\)"(?:[^"]|(?:\\"))*(?<!\\)"/g,
-      TokenKind.QuotedString,
-    ];
+    let quotedString: TokenDef;
+
+    if (this.settings.escapeStrings) {
+      quotedString = [
+        true,
+        /^(?<!\\)"(?:[^"]|(?:\\"))*(?<!\\)"/g,
+        TokenKind.QuotedString,
+      ];
+    } else {
+      quotedString = [true, /^"[^"]*"/g, TokenKind.QuotedString];
+    }
 
     this.lexer = buildLexer([
       openBrace,
