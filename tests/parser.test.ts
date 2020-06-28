@@ -39,9 +39,23 @@ describe('Parser', () => {
       expect(result.value).toEqual('value 1 and 2');
       assertSingleLinePos(result, 15);
     });
-    test('should allow escaped double quote', () => {
+    test('should not allow escaped double quote if disabled', () => {
+      const unescapedParser = new KeyValuesParser({ escapeStrings: false });
       const text = `"value\\"WithQuote"`;
-      const result = parseWith(text, parser.lexer, parser.quotedString);
+      const fun = () => {
+        parseWith(text, unescapedParser.lexer, unescapedParser.quotedString);
+      };
+
+      expect(fun).toThrow();
+    });
+    test('should allow escaped double quote if enabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: true });
+      const text = `"value\\"WithQuote"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
 
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
