@@ -7,7 +7,6 @@ import {
   apply,
   seq,
   alt,
-  opt_sc,
   kmid,
   Parser,
   rep_sc,
@@ -197,14 +196,14 @@ export default class KeyValuesParser {
       values: [
         Token<TokenKind.LBrace>,
         Trivia[],
-        [PropertyASTNodeImpl, Trivia[]][] | undefined,
+        [PropertyASTNodeImpl, Trivia[]][],
         Trivia[],
         Token<TokenKind.RBrace>
       ]
     ) => ObjectASTNodeImpl = (values) => {
       const lBrace = values[0];
       const preComments: ObjectChild[] = triviaToComments(values[1]);
-      const rawChildren = values[2] || [];
+      const rawChildren = values[2];
       const postComments: ObjectChild[] = triviaToComments(values[3]);
       const rBrace = values[4];
 
@@ -280,13 +279,11 @@ export default class KeyValuesParser {
         seq(
           this.openBrace, // A left brace ({) ...
           rep_sc(this.trivia), // ...followed by some trivia...
-          opt_sc(
-            // ...followed by an optional list of properties...
-            rep_sc(
-              seq(
-                property, //...containing properties...
-                some_sc(this.trivia) // ...separated by space or comments.
-              )
+          // ...followed by an optional list of properties...
+          rep_sc(
+            seq(
+              property, //...containing properties...
+              some_sc(this.trivia) // ...separated by space or comments.
             )
           ),
           rep_sc(this.trivia), // ...followed by some trivia...

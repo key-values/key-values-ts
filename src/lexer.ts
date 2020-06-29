@@ -34,11 +34,11 @@ export default class KeyValuesLexer {
     if (this.settings.escapeStrings) {
       quotedString = [
         true,
-        /^(?<!\\)"(?:[^"]|(?:\\"))*(?<!\\)"/g,
+        /^(?<!\\)"(?:[^"\n]|(?:\\"))*(?<!\\)"/g,
         TokenKind.QuotedString,
       ];
     } else {
-      quotedString = [true, /^"[^"]*"/g, TokenKind.QuotedString];
+      quotedString = [true, /^"[^"\n]*"/g, TokenKind.QuotedString];
     }
 
     this.lexer = buildLexer([
