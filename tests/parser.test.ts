@@ -18,6 +18,46 @@ describe('Parser', () => {
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 5);
     });
+    test('should fail with quotes', () => {
+      const text = `value"`;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.unquotedString);
+      };
+
+      expect(fun).toThrow();
+    });
+    test('should fail with spaces', () => {
+      const text = `value `;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.unquotedString);
+      };
+
+      expect(fun).toThrow();
+    });
+    test('should fail with tabs', () => {
+      const text = `value\t`;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.unquotedString);
+      };
+
+      expect(fun).toThrow();
+    });
+    test('should fail with newline', () => {
+      const text = `value\n`;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.unquotedString);
+      };
+
+      expect(fun).toThrow();
+    });
+    test('should fail with open brace', () => {
+      const text = `value{`;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.unquotedString);
+      };
+
+      expect(fun).toThrow();
+    });
   });
   // Quoted string
   describe('quoted string', () => {
@@ -29,6 +69,32 @@ describe('Parser', () => {
       expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 7);
+    });
+    test('should parse string with braces', () => {
+      const text = `"value{}"`;
+      const result = parseWith(text, parser.lexer, parser.quotedString);
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value{}');
+      assertSingleLinePos(result, 9);
+    });
+    test('should parse string with spaces and tabs', () => {
+      const text = `"value \t"`;
+      const result = parseWith(text, parser.lexer, parser.quotedString);
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value \t');
+      assertSingleLinePos(result, 9);
+    });
+    test('should fail with newline', () => {
+      const text = `"value\n"`;
+      const fun = () => {
+        parseWith(text, parser.lexer, parser.quotedString);
+      };
+
+      expect(fun).toThrow();
     });
     test('should parse string with spacing', () => {
       const text = `"value 1 and 2"`;
@@ -74,7 +140,7 @@ describe('Parser', () => {
       expect(result.value).toEqual('value');
       assertSingleLinePos(result, 5);
     });
-    test('should parse simple quotedstring', () => {
+    test('should parse simple quoted string', () => {
       const text = `"value"`;
       const result = parseWith(text, parser.lexer, parser.string);
 
