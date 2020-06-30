@@ -1,9 +1,7 @@
 # KeyValues.ts <!-- omit in toc -->
 [![npm package](https://img.shields.io/npm/v/key-values-ts)](https://www.npmjs.com/package/key-values-ts)
 [![License](https://img.shields.io/github/license/key-values/key-values-ts)](https://github.com/key-values/key-values-ts/blob/master/LICENSE)
-[![Build status](https://github.com/key-values/key-values-ts/workflows/build/badge.svg)](https://github.com/key-values/key-values-ts/actions?query=workflow%3Abuild)
-[![Lint status](https://github.com/key-values/key-values-ts/workflows/lint/badge.svg)](https://github.com/key-values/key-values-ts/actions?query=workflow%3Alint)
-[![Test status](https://github.com/key-values/key-values-ts/workflows/test/badge.svg)](https://github.com/key-values/key-values-ts/actions?query=workflow%3Atest)
+[![CI status](https://github.com/key-values/key-values-ts/workflows/ci/badge.svg)](https://github.com/key-values/key-values-ts/actions?query=workflow%3Aci)
 [![Codecov coverage](https://codecov.io/gh/key-values/key-values-ts/branch/master/graph/badge.svg)](https://codecov.io/gh/key-values/key-values-ts)
 
 
