@@ -4,6 +4,7 @@ import {
   CommentASTNodeImpl,
   ObjectASTNodeImpl,
 } from '../src/ast_node_impl';
+import { createStartLinePos } from './test_util';
 
 describe('ASTNodeImpl', () => {
   // String
@@ -212,6 +213,29 @@ describe('ASTNodeImpl', () => {
       expect(obj.children[1].parent).toBe(obj);
       expect(obj.children[2].parent).toBe(obj);
       expect(obj.children[3].parent).toBe(obj);
+    });
+  });
+  // To String
+  describe('toString', () => {
+    test('should stringify simple string node without position or parent', () => {
+      const str = new StringASTNodeImpl('value');
+      const expected = `type: string, value: "value"`;
+
+      expect(str.toString()).toEqual(expected);
+    });
+    test('should stringify simple key node without position', () => {
+      const key = new StringASTNodeImpl('key');
+      const value = new StringASTNodeImpl('value');
+      new PropertyASTNodeImpl(key, value);
+      const expected = `type: string, value: "key", parent: { type: property }`;
+
+      expect(key.toString()).toEqual(expected);
+    });
+    test('should stringify simple string node with position', () => {
+      const str = new StringASTNodeImpl('value', true, createStartLinePos(7));
+      const expected = `type: string (0/7), value: "value"`;
+
+      expect(str.toString()).toEqual(expected);
     });
   });
 });
