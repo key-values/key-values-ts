@@ -1,0 +1,35 @@
+name: ci
+
+on: [pull_request]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check for code style & formatting
+        run: yarn lint
+
+      - name: Run typescript compiler
+        run: yarn build
+
+      - name: Run the tests
+        run: yarn test
+
+        env:
+          CI: true
