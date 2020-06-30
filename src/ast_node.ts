@@ -23,7 +23,7 @@ export interface BaseASTNode {
   readonly parent?: ASTNode;
   readonly pos?: NodePosition;
   readonly children?: ASTNode[];
-  readonly value?: string | null;
+  readonly value?: string;
 }
 
 export type KeyASTNode = StringASTNode;

@@ -146,7 +146,7 @@ export default class KeyValuesParser {
         value.pos.columnEnd
       );
 
-      return new CommentASTNodeImpl(comment, undefined, pos);
+      return new CommentASTNodeImpl(comment, pos);
     };
 
     const applySpace: (value: Token<TokenKind.Space>) => null = () => null;

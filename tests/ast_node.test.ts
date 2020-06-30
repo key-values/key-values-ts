@@ -2,9 +2,14 @@ import {
   StringASTNodeImpl,
   PropertyASTNodeImpl,
   ObjectASTNodeImpl,
-  NodePositionImpl,
 } from '../src/ast_node_impl';
 import { next, findAtOffset, findAtCell } from '../src/ast_node';
+import {
+  createStartPos,
+  createLinePos,
+  createStartLinePos,
+  createStringPropertyNode,
+} from './test_util';
 
 describe('ASTNode', () => {
   // Next
@@ -308,44 +313,3 @@ describe('ASTNode', () => {
     });
   });
 });
-
-/** Creates a simple string property node. */
-function createStringPropertyNode(
-  key: string,
-  value: string
-): PropertyASTNodeImpl {
-  const keyNode = new StringASTNodeImpl(key);
-  const valueNode = new StringASTNodeImpl(value);
-  const propertyNode = new PropertyASTNodeImpl(keyNode, valueNode);
-
-  return propertyNode;
-}
-
-function createStartPos(
-  length: number,
-  rowEnd: number,
-  columnEnd: number
-): NodePositionImpl {
-  return new NodePositionImpl(0, length, 1, 1, rowEnd, columnEnd);
-}
-
-function createLinePos(
-  offset: number,
-  length: number,
-  rowBegin?: number,
-  columnBegin?: number
-): NodePositionImpl {
-  return new NodePositionImpl(
-    offset,
-    length,
-    rowBegin ?? 1,
-    columnBegin ?? offset + 1,
-    rowBegin ?? 1,
-    (columnBegin ?? offset + 1) + length
-  );
-}
-
-/** Asserts that the position data of a single-line node is correct. */
-function createStartLinePos(length: number): NodePositionImpl {
-  return createStartPos(length, 1, length + 1);
-}

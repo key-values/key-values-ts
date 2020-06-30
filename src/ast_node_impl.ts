@@ -43,6 +43,7 @@ export abstract class ASTNodeImpl {
 
   public pos?: NodePosition;
   public parent: ASTNode | undefined;
+  public value?: string;
 
   constructor(pos?: NodePosition) {
     this.pos = pos;
@@ -51,8 +52,13 @@ export abstract class ASTNodeImpl {
   public children: ASTNode[] = [];
 
   public toString(): string {
-    const parentStr = this.parent ? ` parent: {${this.parent.toString()}}` : '';
-    return `type: ${this.type} (${this.pos?.offset}/${this.pos?.length})${parentStr}`;
+    const posStr = this.pos ? ` (${this.pos.offset}/${this.pos.length})` : '';
+    const parentStr = this.parent
+      ? `, parent: { ${this.parent.toString()} }`
+      : '';
+    const valueStr = this.value ? `, value: "${this.value}"` : '';
+
+    return `type: ${this.type}${posStr}${valueStr}${parentStr}`;
   }
 }
 
@@ -71,12 +77,10 @@ export class StringASTNodeImpl extends ASTNodeImpl implements StringASTNode {
 export class CommentASTNodeImpl extends ASTNodeImpl implements CommentASTNode {
   public type: 'comment' = 'comment';
   public value: string;
-  public isInline: boolean;
 
-  constructor(value: string, isInline?: boolean, pos?: NodePosition) {
+  constructor(value: string, pos?: NodePosition) {
     super(pos);
     this.value = value;
-    this.isInline = isInline ?? false;
   }
 }
 

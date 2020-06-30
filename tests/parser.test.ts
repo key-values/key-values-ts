@@ -1,5 +1,5 @@
 import KeyValuesParser, { parseWith } from '../src/parser';
-import { ASTNode } from '../src/ast_node';
+import { assertPos, assertSingleLinePos, assertStartPos } from './test_util';
 
 let parser: KeyValuesParser;
 
@@ -455,36 +455,3 @@ describe('Parser', () => {
     });
   });
 });
-
-/** Asserts that the position data of a node is correct. */
-function assertPos(
-  node: ASTNode,
-  offset: number,
-  length: number,
-  rowBegin: number,
-  columnBegin: number,
-  rowEnd: number,
-  columnEnd: number
-) {
-  expect(node.pos?.offset).toBe(offset);
-  expect(node.pos?.length).toBe(length);
-  expect(node.pos?.rowBegin).toBe(rowBegin);
-  expect(node.pos?.columnBegin).toBe(columnBegin);
-  expect(node.pos?.rowEnd).toBe(rowEnd);
-  expect(node.pos?.columnEnd).toBe(columnEnd);
-}
-
-/** Asserts that the position of a node at the start of the text is correct. */
-function assertStartPos(
-  node: ASTNode,
-  length: number,
-  rowEnd: number,
-  columnEnd: number
-) {
-  assertPos(node, 0, length, 1, 1, rowEnd, columnEnd);
-}
-
-/** Asserts that the position data of a single-line node is correct. */
-function assertSingleLinePos(node: ASTNode, length: number) {
-  assertStartPos(node, length, 1, length + 1);
-}

@@ -4,12 +4,13 @@ import {
   ObjectASTNodeImpl,
 } from '../src/ast_node_impl';
 import * as NodeParser from '../src/node_parser';
+import { createStringPropertyNode } from './test_util';
 
 describe('NodeParser', () => {
   // String node
   describe('parseStringNode', () => {
     test('should parse simple string', () => {
-      const node = createStringNode('value');
+      const node = new StringASTNodeImpl('value');
       const expected = 'value';
 
       expect(NodeParser.parseStringNode(node)).toEqual(expected);
@@ -59,7 +60,7 @@ describe('NodeParser', () => {
       const node = new ObjectASTNodeImpl([
         createStringPropertyNode('key1', 'value1'),
         new PropertyASTNodeImpl(
-          createStringNode('key2'),
+          new StringASTNodeImpl('key2'),
           new ObjectASTNodeImpl([
             createStringPropertyNode('key2.1', 'value2.1'),
             createStringPropertyNode('key2.2', 'value2.2'),
@@ -85,20 +86,3 @@ describe('NodeParser', () => {
     });
   });
 });
-
-/** Creates a simple string node. */
-function createStringNode(value: string): StringASTNodeImpl {
-  return new StringASTNodeImpl(value);
-}
-
-/** Creates a simple string property node. */
-function createStringPropertyNode(
-  key: string,
-  value: string
-): PropertyASTNodeImpl {
-  const keyNode = createStringNode(key);
-  const valueNode = createStringNode(value);
-  const propertyNode = new PropertyASTNodeImpl(keyNode, valueNode);
-
-  return propertyNode;
-}
