@@ -58,7 +58,8 @@
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
       "/node_modules/",
-      "/lib/"
+      "/lib/",
+      "/tests/"
     ]
   }
 }
