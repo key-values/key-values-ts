@@ -3,7 +3,7 @@ name: ci
 on: [pull_request]
 
 jobs:
-  CI:
+  style-build-test:
     runs-on: ubuntu-latest
 
     strategy:
