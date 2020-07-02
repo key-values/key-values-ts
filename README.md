@@ -2,7 +2,7 @@
 [![npm package](https://img.shields.io/npm/v/key-values-ts)](https://www.npmjs.com/package/key-values-ts)
 [![License](https://img.shields.io/github/license/key-values/key-values-ts)](https://github.com/key-values/key-values-ts/blob/master/LICENSE)
 [![CI status](https://github.com/key-values/key-values-ts/workflows/ci/badge.svg)](https://github.com/key-values/key-values-ts/actions?query=workflow%3Aci)
-[![Codecov coverage](https://codecov.io/gh/key-values/key-values-ts/branch/master/graph/badge.svg)](https://codecov.io/gh/key-values/key-values-ts)
+[![Codecov coverage](https://img.shields.io/codecov/c/github/key-values/key-values-ts)](https://codecov.io/gh/key-values/key-values-ts)
 
 
 A JavaScript/TypeScript parser for the [KeyValues](https://developer.valvesoftware.com/wiki/KeyValues_class) data format. KeyValues is an easy-to-use, JSON-like format developed by [Valve Corporation](https://www.valvesoftware.com/en/). It is used in [Steamworks](https://partner.steamgames.com/doc/home) configuration files as well as in several of Valve's games, such as [Dota 2](https://blog.dota2.com).
