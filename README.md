@@ -7,10 +7,6 @@
 
 A JavaScript/TypeScript parser for the [KeyValues](https://developer.valvesoftware.com/wiki/KeyValues_class) data format. KeyValues is an easy-to-use, JSON-like format developed by [Valve Corporation](https://www.valvesoftware.com/en/). It is used in [Steamworks](https://partner.steamgames.com/doc/home) configuration files as well as in several of Valve's games, such as [Dota 2](https://blog.dota2.com).
 
-## Index <!-- omit in toc -->
-- [Installation](#installation)
-- [Usage](#usage)
-
 ## Installation
 
 Using [yarn](https://yarnpkg.com/):
@@ -43,7 +39,7 @@ const obj = KeyValues.parse(input);
 //   }
 // }
 
-// Convert the object back to a KeyValues text
+// Convert the object back to a KeyValues text:
 const output = KeyValues.stringify(obj);
 // "key"
 // {
