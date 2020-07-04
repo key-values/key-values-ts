@@ -114,7 +114,35 @@ describe('Parser', () => {
 
       expect(fun).toThrow();
     });
-    test('should allow escaped double quote if enabled', () => {
+    test('should not process escaped linebreak if disabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: false });
+      const text = `"value\\nWithLinebreak"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\\nWithLinebreak');
+      assertSingleLinePos(result, 22);
+    });
+    test('should not process escaped tab if disabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: false });
+      const text = `"value\\tWithTab"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\\tWithTab');
+      assertSingleLinePos(result, 16);
+    });
+    test('should process escaped double quote if enabled', () => {
       const escapeParser = new KeyValuesParser({ escapeStrings: true });
       const text = `"value\\"WithQuote"`;
       const result = parseWith(
@@ -127,6 +155,34 @@ describe('Parser', () => {
       expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value"WithQuote');
       assertSingleLinePos(result, 18);
+    });
+    test('should process escaped linebreak if enabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: true });
+      const text = `"value\\nWithLinebreak"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\nWithLinebreak');
+      assertSingleLinePos(result, 22);
+    });
+    test('should process escaped tab if enabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: true });
+      const text = `"value\\tWithTab"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\tWithTab');
+      assertSingleLinePos(result, 16);
     });
   });
   // String
