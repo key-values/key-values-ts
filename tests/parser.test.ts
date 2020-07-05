@@ -142,6 +142,20 @@ describe('Parser', () => {
       expect(result.value).toEqual('value\\tWithTab');
       assertSingleLinePos(result, 16);
     });
+    test('should not process escaped backslash if disabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: false });
+      const text = `"value\\\\WithBackslash"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\\\\WithBackslash');
+      assertSingleLinePos(result, 22);
+    });
     test('should process escaped double quote if enabled', () => {
       const escapeParser = new KeyValuesParser({ escapeStrings: true });
       const text = `"value\\"WithQuote"`;
@@ -183,6 +197,20 @@ describe('Parser', () => {
       expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value\tWithTab');
       assertSingleLinePos(result, 16);
+    });
+    test('should process escaped backslash if enabled', () => {
+      const escapeParser = new KeyValuesParser({ escapeStrings: true });
+      const text = `"value\\\\WithBackslash"`;
+      const result = parseWith(
+        text,
+        escapeParser.lexer,
+        escapeParser.quotedString
+      );
+
+      expect(result.type).toEqual('string');
+      expect(result.isQuoted).toBeTruthy();
+      expect(result.value).toEqual('value\\WithBackslash');
+      assertSingleLinePos(result, 21);
     });
   });
   // String
