@@ -121,10 +121,11 @@ export default class KeyValuesParser {
       let str = value.text.slice(1, value.text.length - 1);
 
       if (this.settings.escapeStrings) {
-        // Resolve escaped quotes
+        // Resolve escaped characters
         str = str.replace(/\\"/, '"');
         str = str.replace(/\\n/, '\n');
         str = str.replace(/\\t/, '\t');
+        str = str.replace(/\\\\/, '\\');
       }
 
       return new StringASTNodeImpl(str, true, pos);
