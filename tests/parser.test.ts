@@ -210,7 +210,7 @@ describe('Parser', () => {
       expect(result.type).toEqual('string');
       expect(result.isQuoted).toBeTruthy();
       expect(result.value).toEqual('value\\WithBackslash');
-      assertSingleLinePos(result, 21);
+      assertSingleLinePos(result, 22);
     });
   });
   // String
