@@ -84,7 +84,8 @@ export class CommentASTNodeImpl extends ASTNodeImpl implements CommentASTNode {
   }
 }
 
-export class PropertyASTNodeImpl extends ASTNodeImpl
+export class PropertyASTNodeImpl
+  extends ASTNodeImpl
   implements PropertyASTNode {
   public type: 'property' = 'property';
   public keyNode: KeyASTNode;
